@@ -1,0 +1,4 @@
+# Ignorar package.json en las carpetas Backend y Frontend
+/Backend/node_modules
+/Frontend/node_modules
+```
