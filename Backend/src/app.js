@@ -6,6 +6,7 @@ import productosRoutes from "./routes/products.routes";
 import authRoutes from "./routes/auth.routes";
 import sequelize from '../src/config' 
 import authMiddleware from '../src/middlewares/authMiddleware';
+import inventariorioRoutes from './routes/inventario.routes'
   
   sequelize.sync({ force: false }) // Utiliza { force: true } para recrear las tablas en cada reinicio
     .then(() => {
@@ -27,6 +28,7 @@ app.get('/', (req, res) => {
     })
 })
 
+app.use('/inventario', inventariorioRoutes);
 app.use('/productos',productosRoutes);
 app.use('/auth',authRoutes);
 
