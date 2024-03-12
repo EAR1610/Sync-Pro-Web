@@ -2,11 +2,9 @@ import express from 'express';
 import cors from 'cors';
 
 //Importar rutas
-import productosRoutes from "./routes/products.routes";
 import authRoutes from "./routes/auth.routes";
-import sequelize from '../src/config' 
-import authMiddleware from '../src/middlewares/authMiddleware';
-import inventariorioRoutes from './routes/inventario.routes'
+import sequelize from './config/config';
+import dashboardRoutes from './routes/inventario.routes'
   
   sequelize.sync({ force: false }) // Utiliza { force: true } para recrear las tablas en cada reinicio
     .then(() => {
@@ -16,8 +14,6 @@ import inventariorioRoutes from './routes/inventario.routes'
       console.error('Error al sincronizar tablas:', error);
     });
   
-
-
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -28,8 +24,7 @@ app.get('/', (req, res) => {
     })
 })
 
-app.use('/inventario', inventariorioRoutes);
-app.use('/productos',productosRoutes);
+app.use('/dashboard', dashboardRoutes);
 app.use('/auth',authRoutes);
 
 

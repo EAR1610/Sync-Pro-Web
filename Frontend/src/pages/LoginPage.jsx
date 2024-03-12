@@ -1,48 +1,45 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import Logo  from '../assets/Logo.png'
+import useAuth from '../hook/useAuth';
+import clienteAxios from '../config/clienteAxios';
+import Alerta from '../components/Alerta';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(false);
-  
+  const [password, setPassword] = useState('');  
+  const [alerta, setAlerta] = useState({});
+
+  const { setAuth } = useAuth();
 
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();    
-    const response = await fetch('http://localhost:3000/auth/signin', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 'Nombre': username, 'password':password }),
-    });
-  
-    if (response.ok) {
-      const data = await response.json();
-      const { user, token } = data;
-      const { id, nombre,  esAdmin } = user;
-      setError(false);
-      setPassword('');
-      setUsername('');
-      
-      navigate('/dashboard', {
-        replace: true,      
-        state: {
-          logged: true,
-          id,
-          nombre,
-          esAdmin,
-          token
-        }
+    if( [username, password].includes('') ) {
+      setAlerta({
+        msg: 'Todos los campos son obligatorios',
+        error: true
       });
+      return;
+    }  
 
-    } else {
-      setError(true);      
+    try {
+      const { data } = await clienteAxios.post('/auth/signin', { 'Nombre': username, 'password':password });
+      setAlerta({});
+      localStorage.setItem('token', data.token);      
+      setAuth(data.user);
+      navigate('/dashboard');                          
+    } catch (error) {
+      setAlerta({
+        msg: 'Hubo un error al iniciar sesión',
+        error: true
+      })
     }
+      
   };
+
+  const { msg } = alerta;
 
   return (
     <>        
@@ -59,11 +56,7 @@ const LoginPage = () => {
           </div>
 
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            { error && (
-              <div className="rounded-md bg-red-500 p-4 uppercase text-center font-bold">
-                <h2>Credenciales incorrectas</h2>
-              </div>
-            )}
+            { msg && <Alerta alerta = { alerta }/> }
             <form className="space-y-6" action="#" method="POST" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="text" className="block text-sm font-medium leading-6 text-gray-900">

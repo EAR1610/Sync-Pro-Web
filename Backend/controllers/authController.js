@@ -64,3 +64,8 @@ export const signUp = async (req, res) => {
     }
   };
 
+  export const perfil = async (req, res) => {
+    const { user } = req;
+    res.json(user);
+  }
+
