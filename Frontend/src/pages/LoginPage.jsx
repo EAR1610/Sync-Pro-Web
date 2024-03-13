@@ -27,9 +27,10 @@ const LoginPage = () => {
     try {
       const { data } = await clienteAxios.post('/auth/signin', { 'Nombre': username, 'password':password });
       setAlerta({});
-      localStorage.setItem('token', data.token);      
+      localStorage.setItem('token', data.token);
       setAuth(data.user);
-      navigate('/dashboard');                          
+      localStorage.setItem('auth', JSON.stringify(data.user));
+      navigate('/dashboard');
     } catch (error) {
       setAlerta({
         msg: 'Hubo un error al iniciar sesión',

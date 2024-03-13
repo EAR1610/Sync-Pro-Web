@@ -4,8 +4,11 @@ import clienteAxios from "../config/clienteAxios";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-
-    const [auth, setAuth] = useState({});
+    
+    const [auth, setAuth] = useState(() => {
+      const storedAuth = localStorage.getItem('auth');
+      return storedAuth ? JSON.parse(storedAuth) : {};
+    });
     const [cargando, setCargando] = useState(true);
 
     useEffect(() => {

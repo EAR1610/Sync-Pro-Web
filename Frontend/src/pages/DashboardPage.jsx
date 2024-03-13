@@ -10,6 +10,7 @@ import Product from '../components/Product';
 // Exportar archivos
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
+import "jspdf-autotable";
 import clienteAxios from '../config/clienteAxios';
 
 const DashboardPage = () => {
@@ -98,10 +99,21 @@ const DashboardPage = () => {
 
   // Exportar a Excel
   const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(products);
+    const titleRow = ['Inventario de Productos'];
+    const emptyRow = [];
+    const headerRow = ['Barras', 'Descripcion', 'Existencia', 'Costo', 'PrecioFinal'];
+    const dataRows = products.map(product => [
+      product.Barras,
+      product.Descripcion,
+      product.Existencia,
+      product.Costo,
+      product.PrecioFinal
+    ]);
+    const allRows = [emptyRow, titleRow, emptyRow, headerRow, ...dataRows];
+    const ws = XLSX.utils.aoa_to_sheet(allRows);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Inventario");
-    XLSX.writeFile(wb, "inventario.xlsx");
+    XLSX.utils.book_append_sheet(wb, ws, "Inventario de Productos");
+    XLSX.writeFile(wb, "Inventario de Productos.xlsx");
   };
 
   // Exportar a PDF
@@ -119,21 +131,23 @@ const DashboardPage = () => {
       ];
       tableRows.push(productData);
     });
-    doc.autoTable(tableColumn, tableRows);
-    doc.save('inventario.pdf');
+    const pageCenter = doc.internal.pageSize.width / 2;
+    doc.text("Inventario de Productos", pageCenter, 10, { align: "center" });
+    doc.autoTable(tableColumn, tableRows, { startY: 20 });
+    doc.save("Inventario de Productos.pdf");
   };
 
   const renderHeader = () => {
     return (
       <div className="flex justify-content-space-between" >
         <div className="flex-1 justify-content-end">
-          <span className="p-input-icon-left">            
+          <span className="p-input-icon-left p-5">            
             <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar" />
           </span>
         </div>
         <div>
-          <Button className='mr-1' type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportToExcel} data-pr-tooltip="XLS" />
-          <Button type="button" icon="pi pi-file-pdf" severity="warning" rounded onClick={exportToPDF} data-pr-tooltip="PDF" />
+          <Button className='mr-1 text-white text-sm bg-green-600 p-3 rounded-md uppercase font-bold' type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportToExcel} data-pr-tooltip="XLS" />
+          <Button className='text-white text-sm bg-red-600 p-3 rounded-md uppercase font-bold' type="button" icon="pi pi-file-pdf" severity="warning" rounded onClick={exportToPDF} data-pr-tooltip="PDF" />
         </div>
       </div>
     );

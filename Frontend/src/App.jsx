@@ -1,11 +1,14 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
 import AuthLayout from './layouts/AuthLayout'
 import RutaProtegida from './layouts/RutaProtegida'
-import DashboardPage from './pages/DashboardPage'
 
-import LoginPage from './pages/LoginPage'
 import { AuthProvider } from './context/AuthProvider'
 import { DashboardProvider } from './context/DashboardProvider'
+
+import DashboardPage from './pages/DashboardPage'
+import LoginPage from './pages/LoginPage'
+import VentasPage from './pages/VentasPage'
 
 function App() {
 
@@ -20,9 +23,10 @@ function App() {
                   
                   <Route path='/dashboard' element={ <RutaProtegida /> }>
                     <Route index element={ <DashboardPage /> } />
+                    <Route path='ventas' element={ <VentasPage /> } />
                   </Route>
               </Routes>          
-            </DashboardProvider>       
+            </DashboardProvider>
         </AuthProvider>
     </BrowserRouter>
   )

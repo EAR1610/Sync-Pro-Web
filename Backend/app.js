@@ -5,6 +5,8 @@ import cors from 'cors';
 import authRoutes from "./routes/auth.routes";
 import sequelize from './config/config';
 import dashboardRoutes from './routes/inventario.routes'
+import empresaRoutes from './routes/empresa.routes'
+import reporteVentasRoutes from './routes/reporteVentas.routes';
   
   sequelize.sync({ force: false }) // Utiliza { force: true } para recrear las tablas en cada reinicio
     .then(() => {
@@ -26,6 +28,8 @@ app.get('/', (req, res) => {
 
 app.use('/dashboard', dashboardRoutes);
 app.use('/auth',authRoutes);
+app.use('/empresa', empresaRoutes);
+app.use('/reporte_ventas', reporteVentasRoutes);
 
 
 export default app;

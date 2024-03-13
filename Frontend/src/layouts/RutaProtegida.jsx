@@ -4,7 +4,7 @@ import Header from "../components/Header";
 
 const RutaProtegida = () => {
     const { auth, cargando, cerrarSesionAuth } = useAuth();
-      
+      console.log(auth);
     return (
         <>
             {                
