@@ -59,9 +59,8 @@ const Product = ({ productDialog, setProductDialog, product }) => {
   };
 
   return (
-    <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Detalles" modal className="p-fluid" onHide={hideDialog}>
-      {/*imagenURL ? <img src={imagenURL} style={{ width: '100%' }} alt={inventario.Descripcion} className="product-image block m-auto pb-3" /> : <Skeleton width="100%" height='10rem'></Skeleton>*/}
-      {imagenURL ? <img src={imagenURL} style={{ width: '300px', height: '300px' }} alt={inventario.Descripcion} className="product-image block m-auto pb-3" /> : <Skeleton width="100%" height='10rem'></Skeleton>}
+    <Dialog visible={productDialog} style={{ width: '32rem' }} breakpoints={{ '960px': '75vw', '641px': '90vw' }} header="Detalles" modal className="p-fluid" onHide={hideDialog}>      
+      {imagenURL ? <img src={imagenURL} style={{ width: '200px', height: '200px' }} alt={inventario.Descripcion} className="product-image block m-auto pb-3" /> : <Skeleton width="100%" height='10rem'></Skeleton>}
       <div className="field">
         <label htmlFor="barras" className="font-bold">
           Barras

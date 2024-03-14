@@ -3,8 +3,7 @@ import useAuth from "../hook/useAuth";
 import Header from "../components/Header";
 
 const RutaProtegida = () => {
-    const { auth, cargando, cerrarSesionAuth } = useAuth();
-      console.log(auth);
+    const { auth, cargando, cerrarSesionAuth } = useAuth();    
     return (
         <>
             {                
@@ -12,6 +11,7 @@ const RutaProtegida = () => {
                     <div className='bg-gray-100'>
                         <Header 
                             cerrarSesionAuth={cerrarSesionAuth}
+                            auth={auth}
                         />
 
                         <main className='p-10 flex-1 '>

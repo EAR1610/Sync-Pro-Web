@@ -20,8 +20,7 @@ const reporteVentasController = {
                     },
                     type: sequelize.QueryTypes.SELECT,
                 }
-            );
-            console.log(result);
+            );            
             if (result.length > 0) {
                 res.status(200).json(result);
             } else {

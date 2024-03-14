@@ -91,8 +91,7 @@ const DashboardPage = () => {
   const actionBodyTemplate = (rowData) => {
     return (
       <React.Fragment>
-        <Button icon="pi pi-eye" rounded text raised severity="info" className="mr-2" onClick={() => editProduct(rowData)} />
-        {/* <Button icon="pi pi-trash" rounded text raised severity="danger" onClick={() => confirmDeleteProduct(rowData)} /> */}
+        <Button icon="pi pi-eye" rounded text raised severity="info" className="mr-2" onClick={() => editProduct(rowData)} />        
       </React.Fragment>
     );
   };
@@ -145,7 +144,7 @@ const DashboardPage = () => {
             <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar" />
           </span>
         </div>
-        <div>
+        <div className='flex'>
           <Button className='mr-1 text-white text-sm bg-green-600 p-3 rounded-md uppercase font-bold' type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportToExcel} data-pr-tooltip="XLS" />
           <Button className='text-white text-sm bg-red-600 p-3 rounded-md uppercase font-bold' type="button" icon="pi pi-file-pdf" severity="warning" rounded onClick={exportToPDF} data-pr-tooltip="PDF" />
         </div>
@@ -177,18 +176,14 @@ const DashboardPage = () => {
           scrollable
           scrollHeight="500px"
           globalFilter={globalFilterValue}
-        >
-          {/* {columns.map((col, i) => (
-            <Column key={col.field} field={col.field} header={col.header} sortable filter />
-          ))} */}
-
+        >        
           <Column body={actionBodyTemplate} exportable={false} style={{ width: '4rem' }}></Column>
           {columns.map((col, i) => (
             <Column key={`${col.field}-${i}`} field={col.field} header={col.header} sortable />
           ))}
         </DataTable>
       </div>
-      {productDialog && <Product productDialog={productDialog} product={registro} setProductDialog={setProductDialog} />}
+      { productDialog && <Product productDialog={productDialog} product={registro} setProductDialog={setProductDialog} /> }
     </div>
   );
 }

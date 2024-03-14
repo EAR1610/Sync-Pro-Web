@@ -5,6 +5,7 @@ import { Button } from "primereact/button";
 import { FilterMatchMode } from "primereact/api";
 import { Calendar } from 'primereact/calendar';
 import { Toast } from 'primereact/toast';
+import { Dropdown } from "primereact/dropdown";
 
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -13,13 +14,15 @@ import { es } from 'date-fns/locale';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import "jspdf-autotable";
+
 import clienteAxios from "../config/clienteAxios";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const VentasPage = () => {
   const [startDate, setStartDate] = useState(null);
   const [finalDate, setFinalDate] = useState(null);
-  const [sale, setSale] = useState([])
-  const [record, setRecord] = useState([]);
+  const [sale, setSale] = useState([])  
   const [selectSale, setSelectSale] = useState(null);  
 
   const toast = useRef(null);
@@ -30,9 +33,64 @@ const VentasPage = () => {
     global: { value: null, matchMode: FilterMatchMode.CONTAINS }
   });
 
-  const mostarAlertaFlotante = () => {
-    toast.current.show({ severity: 'error', summary: 'Información', detail: 'No hay ventas registradas en las fechas establecidas' });
+  const mostarAlertaFlotante = ( tipo, message) => {
+    toast.current.show({ severity: tipo, summary: 'Información', detail: message });
   }
+
+  // Definir un estado para los vendedores
+  const [sellers, setSellers] = useState([{ nombre: 'TODOS', value: -1}]);
+  const [selectedSeller, setSelectedSeller] = useState(-1);
+
+  const paymentTypes= [
+    { label: 'Contado', value: 'CON' },
+    { label: 'Crédito', value: 'CRE' },
+    { label: 'CON/CRE', value: 'NO' }
+  ];
+
+  const [selectedPaymentType, setSelectedPaymentType] = useState('NO');  
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+
+    const verificarAcceso = () => {
+      const auth = JSON.parse(localStorage.getItem('auth') || {});      
+      if ( !auth.esAdmin ) {        
+          navigate('/dashboard');      
+      }
+    }
+
+    const fetchSellers = async () => {
+      try {        
+          const token = localStorage.getItem('token');
+          if( !token ) {
+              return;
+          }
+
+          const config = {
+              headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`
+              }
+          }
+          const response = await clienteAxios.get('/vendedor', config);
+          
+          if (!response) {
+              throw new Error('Error al cargar los vendedores.');
+          }          
+          const { data } = await response;
+
+          const vendedores = sellers.concat(data);          
+          setSellers(vendedores); 
+          setSelectedSeller(-1);
+      } catch (error) {
+          console.error('Hubo un error:', error);
+      }
+  };
+  verificarAcceso();
+  fetchSellers();
+  }, [])
+  
   
   const columns = [
     { field: 'Fecha', header: 'Fecha' },
@@ -59,19 +117,22 @@ const VentasPage = () => {
         },        
       }
       
+      mostarAlertaFlotante('info', 'Consultando las ventas');
+      
       const response = await clienteAxios.post('/reporte_ventas/general', {
           fechaDesde: startDate,
           fechaHasta: finalDate,
           codMoneda: 1,
           rdTipo: 0,
-          vendedorId: -1,
+          vendedorId: selectedSeller,
           bodegaId: -1,
-          contadorCredit: "NO"
+          contadorCredit: selectedPaymentType
       }, config);      
 
       if (!response) {
         throw new Error('Error al cargar las ventas');
       }      
+      
 
       let { data } = await response;      
       setLoading(false);
@@ -84,7 +145,7 @@ const VentasPage = () => {
       });
       setSale(data);
     } catch (error) {
-      mostarAlertaFlotante();
+      mostarAlertaFlotante('error', 'No hay ventas registradas en las fechas establecidas');
       setSale([]);
       console.log('Hubo un error:', error);
     }
@@ -99,35 +160,15 @@ const VentasPage = () => {
 
   // Exportar a Excel
   const exportToExcel = () => {
-    const formattedStartDate = format(new Date(startDate), 'd MMMM yyyy', { locale: es });
-    const formattedFinalDate = format(new Date(finalDate), 'd MMMM yyyy', { locale: es });
-    const titleRow = ['Reporte de Ventas desde el ' + formattedStartDate + ' hasta el ' + formattedFinalDate];
-    const emptyRow = [];
-    const headerRow = ['Fecha', 'Tipo', 'Cliente', 'Exento', 'Descuento', 'Impuesto', 'Total'];
-    const dataRows = sale.map(sale => [
-      sale.Fecha,
-      sale.Tipo,
-      sale.NombreCliente,
-      sale.Exento,
-      sale.TotalDescuento,
-      sale.TotalImpuesto,
-      sale.Total
-    ]);
-    const allRows = [emptyRow, titleRow, emptyRow, headerRow, ...dataRows];
-    const ws = XLSX.utils.aoa_to_sheet(allRows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Reporte de Ventas");
-    XLSX.writeFile(wb, "Reporte de Ventas.xlsx");
-  };
-
-
-  // Exportar a PDF
-  const exportToPDF = () => {
-    const doc = new jsPDF();
-    const tableColumn = ["Fecha", "Tipo", "Cliente", "Exento", "Descuento", "Impuesto", "Total"];
-    const tableRows = [];
-    sale.forEach(sale => {
-      const reportData = [
+    if( sale.length === 0 ) {
+      mostarAlertaFlotante('error', 'No hay ventas para generar el reporte');
+    } else {
+      const formattedStartDate = format(new Date(startDate), 'd MMMM yyyy', { locale: es });
+      const formattedFinalDate = format(new Date(finalDate), 'd MMMM yyyy', { locale: es });
+      const titleRow = ['Reporte de Ventas desde el ' + formattedStartDate + ' hasta el ' + formattedFinalDate];
+      const emptyRow = [];
+      const headerRow = ['Fecha', 'Tipo', 'Cliente', 'Exento', 'Descuento', 'Impuesto', 'Total'];
+      const dataRows = sale.map(sale => [
         sale.Fecha,
         sale.Tipo,
         sale.NombreCliente,
@@ -135,25 +176,53 @@ const VentasPage = () => {
         sale.TotalDescuento,
         sale.TotalImpuesto,
         sale.Total
-      ];
-      tableRows.push(reportData);
-    });
-    const formattedStartDate = format(new Date(startDate), 'd MMMM yyyy', { locale: es });
-    const formattedFinalDate = format(new Date(finalDate), 'd MMMM yyyy', { locale: es });
+      ]);
+      const allRows = [emptyRow, titleRow, emptyRow, headerRow, ...dataRows];
+      const ws = XLSX.utils.aoa_to_sheet(allRows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Reporte de Ventas");
+      XLSX.writeFile(wb, "Reporte de Ventas.xlsx");
+    }
+  };
 
-    const pageCenter = doc.internal.pageSize.width / 2;
 
-    doc.text("Reporte de Ventas", pageCenter, 10, { align: "center" });
-    doc.text(`Desde: ${formattedStartDate}`, pageCenter, 20, { align: "center" });
-    doc.text(`Hasta: ${formattedFinalDate}`, pageCenter, 30, { align: "center" });
+  // Exportar a PDF
+  const exportToPDF = () => {
+    if( sale.length === 0 ) {
+      mostarAlertaFlotante('error', 'No hay ventas para generar el reporte');
+    } else {
+      const doc = new jsPDF();
+      const tableColumn = ["Fecha", "Tipo", "Cliente", "Exento", "Descuento", "Impuesto", "Total"];
+      const tableRows = [];
+      sale.forEach(sale => {
+        const reportData = [
+          sale.Fecha,
+          sale.Tipo,
+          sale.NombreCliente,
+          sale.Exento,
+          sale.TotalDescuento,
+          sale.TotalImpuesto,
+          sale.Total
+        ];
+        tableRows.push(reportData);
+      });
+      const formattedStartDate = format(new Date(startDate), 'd MMMM yyyy', { locale: es });
+      const formattedFinalDate = format(new Date(finalDate), 'd MMMM yyyy', { locale: es });
 
-    doc.autoTable(tableColumn, tableRows, { startY: 40 });
-    doc.save('Reporte de Ventas.pdf');
+      const pageCenter = doc.internal.pageSize.width / 2;
+
+      doc.text("Reporte de Ventas", pageCenter, 10, { align: "center" });
+      doc.text(`Desde: ${formattedStartDate}`, pageCenter, 20, { align: "center" });
+      doc.text(`Hasta: ${formattedFinalDate}`, pageCenter, 30, { align: "center" });
+
+      doc.autoTable(tableColumn, tableRows, { startY: 40 });
+      doc.save('Reporte de Ventas.pdf');
+    }
   };
 
   const renderHeader = () => {
     return (
-      <div className="card flex flex-wrap gap-3 p-fluid">
+      <div className="card flex flex-wrap gap-3 p-fluid justify-center">
         <div className="flex-auto">
           <label htmlFor="buttondisplay" className="font-bold block mb-2">
             Fecha Desde
@@ -166,6 +235,31 @@ const VentasPage = () => {
           </label>
           <Calendar value={finalDate} onChange={(e) => setFinalDate(e.value)} dateFormat="dd/mm/yy" showIcon />
         </div>
+        <div className="flex-auto">
+                    <label htmlFor="sellerDropdown" className="font-bold block mb-2">
+                        Vendedor
+                    </label>
+                    <Dropdown
+                        id="sellerDropdown"
+                        value={selectedSeller}
+                        options={sellers}
+                        onChange={(e) => setSelectedSeller(e.value)}
+                        optionLabel="nombre" // nombre de la API
+                        placeholder="Selecciona un vendedor"
+                    />
+                </div>
+                <div className="flex-auto">
+                    <label htmlFor="paymentTypeDropdown" className="font-bold block mb-2">
+                        Tipo de Pago
+                    </label>
+                    <Dropdown
+                        id="paymentTypeDropdown"
+                        value={selectedPaymentType}
+                        options={paymentTypes}
+                        onChange={(e) => setSelectedPaymentType(e.value)}
+                        placeholder="Selecciona un tipo de pago"
+                    />
+                </div>
         <button className='text-white text-sm bg-sky-600 p-3 rounded-md uppercase font-bold' onClick={onSearchClick}>Buscar</button>
         <Button  className='mr-1 text-white text-sm bg-green-600 p-3 rounded-md uppercase font-bold' type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportToExcel} data-pr-tooltip="XLS" />
         <Button  className='text-white text-sm bg-red-600 p-3 rounded-md uppercase font-bold' type="button" icon="pi pi-file-pdf" severity="warning" rounded onClick={exportToPDF} data-pr-tooltip="PDF" />
