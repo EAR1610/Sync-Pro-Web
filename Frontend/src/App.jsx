@@ -9,6 +9,7 @@ import { DashboardProvider } from './context/DashboardProvider'
 import DashboardPage from './pages/DashboardPage'
 import LoginPage from './pages/LoginPage'
 import VentasPage from './pages/VentasPage'
+import CajaPage from './pages/CajaPage'
 
 function App() {
 
@@ -24,6 +25,7 @@ function App() {
                   <Route path='/dashboard' element={ <RutaProtegida /> }>
                     <Route index element={ <DashboardPage /> } />
                     <Route path='ventas' element={ <VentasPage /> } />
+                    <Route path='cajas' element={ <CajaPage /> } />
                   </Route>
               </Routes>          
             </DashboardProvider>

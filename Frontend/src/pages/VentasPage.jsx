@@ -78,7 +78,7 @@ const VentasPage = () => {
           if (!response) {
               throw new Error('Error al cargar los vendedores.');
           }          
-          const { data } = await response;
+          const { data } = response;
 
           const vendedores = sellers.concat(data);          
           setSellers(vendedores); 

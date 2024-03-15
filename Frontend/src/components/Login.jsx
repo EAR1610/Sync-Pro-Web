@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import React from 'react'
-import Logo  from '../assets/Logo.png'
+import Logo  from '../assets/Logo_SyncPro.png'
 import Navbar from './Navbar';
 
 const Login = () => {

@@ -8,6 +8,7 @@ import dashboardRoutes from './routes/inventario.routes'
 import empresaRoutes from './routes/empresa.routes'
 import reporteVentasRoutes from './routes/reporteVentas.routes';
 import vendedorRoutes from './routes/vendedor.routes';
+import cajaRoutes from './routes/caja.routes';
   
   sequelize.sync({ force: false }) // Utiliza { force: true } para recrear las tablas en cada reinicio
     .then(() => {
@@ -32,6 +33,7 @@ app.use('/auth',authRoutes);
 app.use('/empresa', empresaRoutes);
 app.use('/reporte_ventas', reporteVentasRoutes);
 app.use('/vendedor', vendedorRoutes)
+app.use('/caja', cajaRoutes)
 
 
 export default app;

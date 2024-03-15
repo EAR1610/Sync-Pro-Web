@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import Logo  from '../assets/Logo.png'
+import Logo  from '../assets/Logo.ico'
 import useAuth from '../hook/useAuth';
 import clienteAxios from '../config/clienteAxios';
 import Alerta from '../components/Alerta';
@@ -43,13 +43,14 @@ const LoginPage = () => {
   const { msg } = alerta;
 
   return (
-    <>        
+    <>     
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
             <img
-              className="mx-auto h-10 w-auto"
+              className="mx-auto w-auto"
               src={Logo}
               alt="Your Company"
+              style={{height: '8rem'}}
             />
             <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
               Inicia sesión en tu cuenta
@@ -100,11 +101,17 @@ const LoginPage = () => {
               <div>
                 <button
                   type="submit"
-                  className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className="flex w-full justify-center rounded-md bg-sky-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-800"
                 >
                   Iniciar sesión
                 </button>
               </div>
+              <div>
+                <div className="sm:mx-auto sm:w-full sm:max-w-sm items-center text-center flex flex-col">
+                    <label htmlFor="" className='mt-10 font-bold leading-9 tracking-tight text-gray-900'>Copyright</label>
+                    <label htmlFor="" className='text-center items-center text-2xl font-bold leading-9 tracking-tight text-gray-900'>Super Sistemas</label>
+                </div>
+              </div>              
             </form>          
           </div>
         </div>

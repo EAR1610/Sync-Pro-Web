@@ -92,6 +92,13 @@ const Header = ({ cerrarSesionAuth, auth }) => {
                                 <ul className="h-screen md:h-auto items-center justify-center md:flex ">
                                     <li className="pb-6 text-xl text-blue py-2 md:px-6 text-center border-b-2 md:border-b-0">
                                         <Link                        
+                                            to='/dashboard/cajas'
+                                            className='font-bold uppercase'
+                                            onClick={() => setNavbar(!navbar)}
+                                        >Cajas</Link>
+                                    </li>
+                                    <li className="pb-6 text-xl text-blue py-2 md:px-6 text-center border-b-2 md:border-b-0">
+                                        <Link                        
                                             to='/dashboard/ventas'
                                             className='font-bold uppercase'
                                             onClick={() => setNavbar(!navbar)}
@@ -107,7 +114,7 @@ const Header = ({ cerrarSesionAuth, auth }) => {
                                     <li className="pb-6 text-xl text-blue py-2 px-6 text-center  border-b-2 md:border-b-0">
                                         <button
                                             type="button"
-                                            className='text-blue text-sm text-white bg-sky-600 p-3 rounded-md uppercase font-bold'
+                                            className='text-blue text-sm text-white bg-sky-600 p-3 rounded-lg uppercase font-bold'
                                             onClick={handleCerrarSesion}
                                         >Cerrar Sesión</button>   
                                     </li>
@@ -124,7 +131,7 @@ const Header = ({ cerrarSesionAuth, auth }) => {
                                         <li className="pb-6 text-xl text-blue py-2 px-6 text-center  border-b-2 md:border-b-0">
                                         <button
                                             type="button"
-                                            className='text-blue text-sm text-white bg-sky-600 p-3 rounded-md uppercase font-bold'
+                                            className='text-blue text-sm text-white bg-sky-600 p-3 rounded-lg uppercase font-bold'
                                             onClick={handleCerrarSesion}
                                         >Cerrar Sesión</button>   
                                     </li>
