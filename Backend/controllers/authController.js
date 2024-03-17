@@ -64,6 +64,18 @@ export const signUp = async (req, res) => {
     }
   };
 
+  export const users = async (req, res) => {
+    try {
+      const users = await Usuario.findAll({
+        attributes: ['id', 'Nombre'],
+      });
+      res.json(users);
+    } catch (error) {
+      console.error('Error al obtener los usuarios:', error);
+      res.status(500).json({ message: 'Error interno del servidor' });
+    }
+  };
+
   export const perfil = async (req, res) => {
     const { user } = req;
     res.json(user);

@@ -4,7 +4,8 @@ const router = Router()
 import {
     signUp,
     signIn,
-    perfil
+    perfil,
+    users
 } from '../controllers/authController'
 
 import checkAuth from  '../middleware/checkAuth'
@@ -13,6 +14,7 @@ import checkAuth from  '../middleware/checkAuth'
 router.post('/signup', signUp)
 router.post('/signin', signIn)
 router.get('/perfil', checkAuth, perfil);
+router.get('/users', users);
 
 
 export default router;
