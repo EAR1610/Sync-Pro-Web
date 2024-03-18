@@ -227,7 +227,7 @@ const VentasPage = () => {
           <label htmlFor="buttondisplay" className="font-bold block mb-2">
             Fecha Desde
           </label>
-          <Calendar id="buttondisplay" value={startDate} onChange={(e) => setStartDate(e.value)} dateFormat="dd/mm/yy" showIcon  />
+          <Calendar id="buttondisplay" value={startDate} onChange={(e) => setStartDate(e.value)} dateFormat="dd/mm/yy" showIcon className="bg-sky-400" />
         </div>
         <div className="flex-auto">
           <label htmlFor="buttondisplay" className="font-bold block mb-2">

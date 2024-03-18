@@ -38,7 +38,13 @@ const Header = ({ cerrarSesionAuth, auth }) => {
             throw new Error('Error al cargar la empresa');
         }
       }
+      const dimensionDispositivo = async () => {
+         if (window.innerWidth < 640) {
+            setNavbar(!navbar);
+          }
+      }
       cargarEmpresa();
+      dimensionDispositivo();      
     }, []);
     
 
@@ -66,7 +72,7 @@ const Header = ({ cerrarSesionAuth, auth }) => {
                         className="p-2 text-gray-700 rounded-md outline-none focus:border-gray-400 focus:border"
                         onClick={() => setNavbar(!navbar)}
                         >
-                        {navbar ? (
+                        { navbar ? (
                             <img src={Cerrar} width={35} height={35} alt="logo" />
                         ) : (
                             <img
@@ -90,21 +96,21 @@ const Header = ({ cerrarSesionAuth, auth }) => {
                         {
                             auth.esAdmin ? (
                                 <ul className="h-screen md:h-auto items-center justify-center md:flex ">
-                                    <li className="pb-6 text-xl text-blue py-2 md:px-6 text-center border-b-2 md:border-b-0">
+                                    <li className="pb-6 text-xl text-blue py-2 md:px-6 text-center border-b-2 md:border-b-0 hover:bg-sky-400 hover:text-white transition-colors duration-300 rounded-lg">
                                         <Link                        
                                             to='/dashboard/cajas'
                                             className='font-bold uppercase'
                                             onClick={() => setNavbar(!navbar)}
                                         >Cajas</Link>
                                     </li>
-                                    <li className="pb-6 text-xl text-blue py-2 md:px-6 text-center border-b-2 md:border-b-0">
+                                    <li className="pb-6 text-xl text-blue py-2 md:px-6 text-center border-b-2 md:border-b-0 hover:bg-sky-400 hover:text-white transition-colors duration-300 rounded-lg">
                                         <Link                        
                                             to='/dashboard/ventas'
                                             className='font-bold uppercase'
                                             onClick={() => setNavbar(!navbar)}
                                         >Ventas</Link>
                                     </li>
-                                    <li className="pb-6 text-xl text-blue py-2 px-6 text-center  border-b-2 md:border-b-0">
+                                    <li className="pb-6 text-xl text-blue py-2 px-6 text-center  border-b-2 md:border-b-0 hover:bg-sky-400 hover:text-white transition-colors duration-300 rounded-lg">
                                         <Link
                                             to="/dashboard"
                                             className='font-bold uppercase'

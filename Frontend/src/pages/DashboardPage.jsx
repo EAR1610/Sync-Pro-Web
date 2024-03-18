@@ -140,10 +140,10 @@ const DashboardPage = () => {
     return (
       <div className="flex justify-content-space-between" >
         <div className="flex-1 justify-content-end">
-          <span className="p-input-icon-left p-5">            
-            <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar" />
+          <span className="">
+            <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar" className='border rounded-lg'/>
           </span>
-          <div>
+          <div className='mt-2'>
             <Button className='mr-1 text-white text-sm bg-green-600 p-3 rounded-md uppercase font-bold' type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportToExcel} data-pr-tooltip="XLS" />
             <Button className='text-white text-sm bg-red-600 p-3 rounded-md uppercase font-bold' type="button" icon="pi pi-file-pdf" severity="warning" rounded onClick={exportToPDF} data-pr-tooltip="PDF" />
           </div>
@@ -157,9 +157,10 @@ const DashboardPage = () => {
   return (
     <div>
       <div className="card">
+
         <DataTable
           dataKey="Barras"
-          size='small'
+          size='small'          
           header={header}
           filters={filters}
           loading={loading}
@@ -176,12 +177,14 @@ const DashboardPage = () => {
           scrollable
           scrollHeight="500px"
           globalFilter={globalFilterValue}
+          className='border border-black-200 divide-y divide-black-200'
         >        
           <Column body={actionBodyTemplate} exportable={false} style={{ width: '4rem' }}></Column>
           {columns.map((col, i) => (
             <Column key={`${col.field}-${i}`} field={col.field} header={col.header} sortable />
           ))}
         </DataTable>
+
       </div>
       { productDialog && <Product productDialog={productDialog} product={registro} setProductDialog={setProductDialog} /> }
     </div>

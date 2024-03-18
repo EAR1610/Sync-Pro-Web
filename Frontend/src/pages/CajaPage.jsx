@@ -87,11 +87,25 @@ const CajaPage = () => {
 
             const response = await clienteAxios.post('/caja/corte', { nApertura: apertura.code }, config);
             
-            if(!response) throw new Error('Error al cargar los usuarios de caja');
+            if(!response) mostarAlertaFlotante('error','Error al obtener el corte de caja');
 
             const { data } = response; 
-
-            const { TotalContado, Ganancia, TotalApertura, TotalVentaE, TotalAbonoE, TotalApartado, TotalEntrada, TotalSalida, PagoCompras, PagoGastos, Depositos, TotalDevolucion, Efectivo, Tarjeta, TotalCredito, Cheques, Transferencias } = data[0];
+            mostarAlertaFlotante('success','Corte de caja cargado.');
+            const roundObjectValues = (obj) => {
+                let newObj = {};
+                for (let key in obj) {
+                    if (typeof obj[key] === 'number') {
+                        newObj[key] = Math.round(obj[key] * 100, 2) / 100;
+                    } else {
+                        newObj[key] = obj[key];
+                    }
+                }
+                return newObj;
+            }
+            
+            // Y luego en tu código:
+            
+            const { TotalContado, Ganancia, TotalApertura, TotalVentaE, TotalAbonoE, TotalApartado, TotalEntrada, TotalSalida, PagoCompras, PagoGastos, Depositos, TotalDevolucion, Efectivo, Tarjeta, TotalCredito, Cheques, Transferencias } = roundObjectValues(data[0]);
 
             setCorte({
                 VentasTotales: (TotalCredito + TotalContado) - TotalDevolucion,
@@ -111,7 +125,7 @@ const CajaPage = () => {
                 TotalCredito,
                 Cheques,
                 Transferencias,
-                FondoCaja : (TotalApertura + TotalVentaE + TotalAbonoE + TotalEntrada + TotalApartado) - (TotalSalida + TotalDevolucion)
+                FondoCaja : (TotalApertura + TotalVentaE + TotalAbonoE + TotalEntrada + TotalApartado) - (TotalSalida + PagoCompras + PagoGastos + Depositos + TotalDevolucion)
             });
             
         } catch (error) {
@@ -126,8 +140,8 @@ const CajaPage = () => {
                 <TabPanel header="Corte">
                     <div className="card flex justify-content-center">
                         <Dropdown value={apertura} onChange={(e) => setApertura(e.value)} options={aperturas} optionLabel="name" 
-                            placeholder="Cajero" className="w-full md:w-14rem" />
-                        <Button label="GENERAR" onClick={ handleCorte } className='flex ml-2 justify-content-center bg-sky-400 text-white px-2 rounded-lg text-xs' size='small'/>
+                            placeholder="Cajero" className="w-full md:w-14rem border" />
+                        <Button label="GENERAR" onClick={ handleCorte } className='flex ml-2 justify-content-center bg-sky-400 text-white px-3 rounded-lg text-xs' size='small'/>
                     </div>
                     <h2 className='text-center bg-sky-400  font-bold p-1 mt-2 rounded-lg text-white'>VENTAS TOTALES</h2>
                     <div className='flex flex-wrap justify-around'>
