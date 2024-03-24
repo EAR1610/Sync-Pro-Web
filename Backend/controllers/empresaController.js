@@ -15,6 +15,20 @@ const empresaController = {
             console.log('Error al ejecutar la consulta:', error);
             res.status(500).json({ message: 'Error interno del servidor.' });
         }
+    },
+    getImagenEmpresa: async (req, res) => {
+        try {
+            const result = await sequelize.query("SELECT Empresa.Imagen FROM Empresa;",
+                {
+                    type: sequelize.QueryTypes.SELECT,
+                }            
+            )
+            console.log(result[0]);
+            res.status(200).json(result[0]);
+        } catch (error) {
+            console.log('Error al ejecutar la consulta:', error);
+            res.status(500).json({ message: 'Error interno del servidor.' });
+        }
     }
 }
 

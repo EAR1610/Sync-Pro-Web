@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
-
+import React, { useState, useEffect, useRef } from "react";
 import { TabView, TabPanel } from 'primereact/tabview';
-import { Dropdown } from 'primereact/dropdown';        
-import { Button } from 'primereact/button';       
-import { Toast } from 'primereact/toast';
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import clienteAxios from "../config/clienteAxios";
+import { Button } from "primereact/button";
+import Cierre from "../components/Cierre";
+import { classNames } from 'primereact/utils';
 
-import clienteAxios from '../config/clienteAxios';
+import { Dropdown } from 'primereact/dropdown';        
+import { Toast } from 'primereact/toast';
         
 const CajaPage = () => {
     const [apertura, setApertura] = useState(null);
@@ -31,6 +34,18 @@ const CajaPage = () => {
         FondoCaja: 0
     });
 
+    const [cierres, setCierres] = useState([]);
+    const [selectCierres, setSelectCierres] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [registro, setRegistro] = useState([]);
+    const [cierreDialog, setCierreDialog] = useState(false);
+
+    const columns = [
+        { field: 'Cierre', header: 'Cierre' },
+        { field: 'Nombre', header: 'Nombre' },
+        { field: 'Fecha', header: 'Fecha' },
+    ];
+
     const toast = useRef(null);
 
     const mostarAlertaFlotante = ( tipo, message) => {
@@ -38,6 +53,39 @@ const CajaPage = () => {
     }
 
     useEffect(() => {
+        const verificarAcceso = () => {
+            const auth = JSON.parse(localStorage.getItem('auth') || {});
+            if (!auth.esAdmin) {
+                navigate('/dashboard');
+            }        
+        }
+
+        const fetchSellers = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('Token de autenticación no encontrado.');
+                }
+                const config = {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+                const response = await clienteAxios.get('/caja/cierre/personalizado', config);
+                
+                if (!response) {
+                    throw new Error('Error al cargar los cierres de caja.');
+                }
+                const { data } = await response;
+                setCierres(data);
+                setLoading(false);
+            } catch (error) {
+                console.error('Hubo un error:', error);
+                setLoading(false);
+            }
+        };
+
        const obtenerUsuarioCajas = async () => {
             try {
                 const token = localStorage.getItem('token');
@@ -69,8 +117,27 @@ const CajaPage = () => {
                 mostarAlertaFlotante('error', 'Ha ocurrido un error');
             }
        }
-       obtenerUsuarioCajas(); 
+       obtenerUsuarioCajas();
+       verificarAcceso();
+       fetchSellers();
     }, []);
+
+    const editCierre = (cierre) => {
+        setRegistro(cierre);
+        setCierreDialog(true);
+    };
+    
+    const verifiedBodyTemplate = (rowData) => {
+        return <i className= {classNames('pi',{ 'text-blue-500 pi-stop': !rowData.Anulado, 'text-blue-500 pi-check-square': rowData.Anulado })}></i>;
+    };
+
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <React.Fragment>
+                <Button icon="pi pi-eye" rounded text raised severity="info" className="mr-2" onClick={() => editCierre(rowData)} />
+            </React.Fragment>
+        );
+    };
 
     const handleCorte = async () => {
         try {
@@ -103,7 +170,6 @@ const CajaPage = () => {
                 return newObj;
             }
             
-            // Y luego en tu código:
             
             const { TotalContado, Ganancia, TotalApertura, TotalVentaE, TotalAbonoE, TotalApartado, TotalEntrada, TotalSalida, PagoCompras, PagoGastos, Depositos, TotalDevolucion, Efectivo, Tarjeta, TotalCredito, Cheques, Transferencias } = roundObjectValues(data[0]);
 
@@ -134,7 +200,7 @@ const CajaPage = () => {
     }
 
     return (
-<div className="card">
+        <div className="card">
             <Toast ref={toast} />
             <TabView>
                 <TabPanel header="Corte">
@@ -233,12 +299,36 @@ const CajaPage = () => {
                     </div>                        
                 </TabPanel>
                 <TabPanel header="Cierre">
-                    <p className="m-0">
-                        Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, 
-                        eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo
-                        enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui 
-                        ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
-                    </p>
+                    <div>
+                        <div className="card">
+                            <DataTable
+                                dataKey="Cierre"
+                                size='small'
+                                loading={loading}
+                                showGridlines
+                                removableSort
+                                value={cierres}
+                                tableStyle={{ minWidth: '50rem' }}
+                                paginator
+                                rows={25}
+                                rowsPerPageOptions={[5, 10, 25, 50]}
+                                selectionMode="single"
+                                selection={selectCierres}
+                                onSelectionChange={(e) => setSelectCierres(e.value)}
+                                scrollable
+                                scrollHeight="500px"
+                            >
+                                <Column body={actionBodyTemplate} exportable={false} style={{ width: '4rem' }}></Column>
+
+                                {columns.map((col, i) => (
+                                    <Column key={`${col.field}-${i}`} field={col.field} header={col.header} />
+                                ))}
+
+                                <Column body={verifiedBodyTemplate} header="Anulado" exportable={false}  style={{ width: '4rem' }}></Column>
+                            </DataTable>
+                        </div>
+                        {cierreDialog && <Cierre cierreDialog={cierreDialog} setCierreDialog={setCierreDialog} cierre={registro} />}
+                    </div>
                 </TabPanel>                
             </TabView>
         </div>       

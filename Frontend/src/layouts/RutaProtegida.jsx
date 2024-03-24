@@ -16,17 +16,21 @@ const RutaProtegida = () => {
                             auth={auth}
                         />
 
-                        <div className='md:flex md:min-h-screen'>
+                        <div className='flex md:min-h-screen'>
                            <Sidebar>
                                 <SidebarItem 
-                                    icon={<img src={DashboardIcon} alt="Dashboard" width={20}/>} text='Dashboard' alert 
+                                    icon={<img src={DashboardIcon} alt="Inventario" width={20}/>} text='Inventario' alert 
                                 />
-                                <SidebarItem icon={<img src={DashboardIcon} alt="Dashboard" width={20}/>} text='Ventas' active />
-                                <SidebarItem icon={<img src={DashboardIcon} alt="Dashboard" width={20}/>} text='Cajas' />
+                                <SidebarItem icon={<img src={DashboardIcon} alt="Sistema de compras" width={20}/>} text='Sistema de compras' active />
+                                <SidebarItem icon={<img src={DashboardIcon} alt="Cajas" width={20}/>} text='Cajas' />
+                                <SidebarItem icon={<img src={DashboardIcon} alt="Sistema de ventas" width={20}/>} text='Sistema de ventas' />
+                                <SidebarItem icon={<img src={DashboardIcon} alt="Reportes" width={20}/>} text='Reportes' />
+                                <SidebarItem icon={<img src={DashboardIcon} alt="Parámetros" width={20}/>} text='Parámetros' />
+                                <SidebarItem icon={<img src={DashboardIcon} alt="Utilidades" width={20}/>} text='Utilidades' />
 
                             </Sidebar>
 
-                           <main className='p-10 flex-1 '>
+                           <main className='p-3 flex-1 '>
                               <Outlet />
                            </main>
                         </div>

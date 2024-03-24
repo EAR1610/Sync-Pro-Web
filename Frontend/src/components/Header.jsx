@@ -32,7 +32,7 @@ const Header = ({ cerrarSesionAuth, auth }) => {
                 throw new Error('Error al cargar la empresa');
             }            
 
-            const { data } = await response;            
+            const { data } = response;            
             setEmpresa(data[0]);
         } catch (error) {
             throw new Error('Error al cargar la empresa');

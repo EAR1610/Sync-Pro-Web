@@ -45,7 +45,7 @@ const cajaController = {
         // Listar cierre de caja (Cierre, nombre, fecha)
         getCierrePersonalizado: async (req, res) => {
             try {
-                const result = await sequelize.query("SELECT CAST(dbo.CierreCaja.NumeroCierre AS varchar) AS Cierre, dbo.Usuario.Nombre, dbo.AperturaCaja.Fecha, CierreCaja.Anulado FROM  dbo.CierreCaja INNER JOIN dbo.AperturaCaja ON dbo.CierreCaja.IdApertura = dbo.AperturaCaja.NApertura INNER JOIN dbo.Usuario ON dbo.AperturaCaja.IdUsuario = dbo.Usuario.Id ORDER BY CierreCaja.NumeroCierre DESC;",
+                const result = await sequelize.query("SELECT CierreCaja.idApertura, CAST(dbo.CierreCaja.NumeroCierre AS varchar) AS Cierre, dbo.Usuario.Nombre, dbo.AperturaCaja.Fecha, CierreCaja.Anulado FROM  dbo.CierreCaja INNER JOIN dbo.AperturaCaja ON dbo.CierreCaja.IdApertura = dbo.AperturaCaja.NApertura INNER JOIN dbo.Usuario ON dbo.AperturaCaja.IdUsuario = dbo.Usuario.Id ORDER BY CierreCaja.NumeroCierre DESC;",
                     {
                         type: sequelize.QueryTypes.SELECT
                     }

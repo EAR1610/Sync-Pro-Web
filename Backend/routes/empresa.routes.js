@@ -8,4 +8,8 @@ router
     .route('/')
     .get(checkAuth, empresaController.getEmpresa);
 
+router
+    .route('/imagen')
+    .get(checkAuth, empresaController.getImagenEmpresa);
+
 export default router;

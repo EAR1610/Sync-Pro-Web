@@ -1,20 +1,57 @@
 import { MoreVertical, ChevronLast, ChevronFirst } from "lucide-react"
-import { useContext, createContext, useState } from "react"
+import { useContext, createContext, useState, useEffect } from "react"
+import clienteAxios from "../config/clienteAxios";
+import { Skeleton } from "primereact/skeleton";
 
 const SidebarContext = createContext()
 
 export default function Sidebar({ children }) {
-  const [expanded, setExpanded] = useState(true)
+  const [expanded, setExpanded] = useState(true);
+  const [imagenURL, setImagenURL] = useState(null);
+
+  useEffect(() => {
+    const cargarImagenEmpresa = async () => {
+      const token = localStorage.getItem('token');
+      if( !token ) {
+          return;
+      }
+  
+      const config = {
+          headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`
+          }
+      }
+  
+      const response = await clienteAxios.get('/empresa/imagen', config);
+      if (!response) {
+          throw new Error('Error al cargar la empresa');
+      }
+      const { data } = response;
+      mostrarImagen(data.Imagen);
+    }
+    cargarImagenEmpresa();
+  }, []);
+
+  const mostrarImagen = (imagenByte) => {
+    if ( imagenByte && imagenByte.data) {
+
+      const tipoImagen = imagenByte.type || 'image/jpeg';
+      const bytesArray = new Uint8Array(imagenByte.data);
+      const blob = new Blob([bytesArray], { type: tipoImagen });
+      const url = URL.createObjectURL(blob);
+      setImagenURL(url);
+    }
+  }
+  
   
   return (
     <aside className="h-screen">
       <nav className="h-full flex flex-col bg-white border-r shadow-sm">
         <div className="p-4 pb-2 flex justify-between items-center">
           <img
-            src="https://img.logoipsum.com/243.svg"
-            className={`overflow-hidden transition-all ${
-              expanded ? "w-32" : "w-0"
-            }`}
+            src={ imagenURL ? imagenURL : <Skeleton shape="circle" size="4rem" className="mr-2"></Skeleton> }
+            className={`overflow-hidden transition-all ${ expanded ? "w-32" : "w-0"}`}
             alt=""
           />
           <button
@@ -64,8 +101,8 @@ export function SidebarItem({ icon, text, active, alert }) {
         transition-colors group
         ${
           active
-            ? "bg-gradient-to-tr from-indigo-200 to-indigo-100 text-indigo-800"
-            : "hover:bg-indigo-50 text-gray-600"
+            ? "bg-gradient-to-tr from-sky-200 to-sky-400 text-indigo-800"
+            : "hover:bg-sky-400 text-gray-600 hover:text-white"
         }
     `}
     >
@@ -79,7 +116,7 @@ export function SidebarItem({ icon, text, active, alert }) {
       </span>
       {alert && (
         <div
-          className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
+          className={`absolute right-2 w-2 h-2 rounded bg-sky-400 ${
             expanded ? "" : "top-2"
           }`}
         />
@@ -88,9 +125,9 @@ export function SidebarItem({ icon, text, active, alert }) {
       {!expanded && (
         <div
           className={`
-          absolute left-full rounded-md px-2 py-1 ml-6
-          bg-indigo-100 text-indigo-800 text-sm
-          invisible opacity-20 -translate-x-3 transition-all
+          absolute z-10 left-full rounded-md px-1 py-1 ml-3
+          bg-sky-800 text-white text-sm
+          invisible -translate-x-3 transition-all
           group-hover:visible group-hover:opacity-100 group-hover:translate-x-0
       `}
         >
