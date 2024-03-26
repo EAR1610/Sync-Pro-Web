@@ -7,4 +7,8 @@ router
     .route("/")
     .get(vendedorController.getVendedores);
 
+router
+    .route('/id/:id')
+    .get(vendedorController.getVendedorById);
+
 export default router;

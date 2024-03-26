@@ -117,6 +117,13 @@ const Header = ({ cerrarSesionAuth, auth }) => {
                                             onClick={() => setNavbar(!navbar)}
                                         >Inventario</Link>
                                     </li>
+                                    <li className="pb-6 text-xl text-blue py-2 px-6 text-center  border-b-2 md:border-b-0 hover:bg-sky-400 hover:text-white transition-colors duration-300 rounded-lg">
+                                        <Link
+                                            to="/dashboard/pedidos"
+                                            className='font-bold uppercase'
+                                            onClick={() => setNavbar(!navbar)}
+                                        >Pedidos</Link>
+                                    </li>
                                     <li className="pb-6 text-xl text-blue py-2 px-6 text-center  border-b-2 md:border-b-0">
                                         <button
                                             type="button"
