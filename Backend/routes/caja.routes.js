@@ -6,22 +6,22 @@ const router = Router();
 
 router
     .route('/cierre')
-    .post(checkAuth, cajaController.getCierreByNumApertura);
+    .post(checkAuth, cajaController.getClosureByOpeningNumber);
 
 router
     .route("/cierre/personalizado")
-    .get(checkAuth, cajaController.getCierrePersonalizado);
+    .get(checkAuth, cajaController.getCustomClosure);
 
 router
     .route("/cierre/:nCierre")
-    .get(checkAuth, cajaController.getCierreByNumCierre);
+    .get(checkAuth, cajaController.getClosureByClosureNumber);
 
 router
     .route("/estado")
-    .get(checkAuth, cajaController.getEstadosByEstado);
+    .get(checkAuth, cajaController.getStatesByState);
 
 router
     .route("/corte")
-    .post(checkAuth, cajaController.getCorteByNumApertura);
+    .post(checkAuth, cajaController.getCutByOpeningNumber);
     
 export default router;

@@ -117,24 +117,40 @@ const DashboardPage = () => {
 
   // Exportar a PDF
   const exportToPDF = () => {
+    if (products.length === 0) {
+      console.error('No hay productos para generar el reporte');
+      return;
+    }
+  
     const doc = new jsPDF();
     const tableColumn = ["Barras", "Descripcion", "Existencia", "Costo", "PrecioFinal"];
     const tableRows = [];
+  
+    // Agregar los datos de los productos a las filas de la tabla
     products.forEach(product => {
-      const productData = [
+      const rowData = [
         product.Barras,
         product.Descripcion,
         product.Existencia,
         product.Costo,
         product.PrecioFinal
       ];
-      tableRows.push(productData);
+      tableRows.push(rowData);
     });
-    const pageCenter = doc.internal.pageSize.width / 2;
-    doc.text("Inventario de Productos", pageCenter, 10, { align: "center" });
-    doc.autoTable(tableColumn, tableRows, { startY: 20 });
-    doc.save("Inventario de Productos.pdf");
-  };
+  
+    // Agregar título al PDF
+    doc.text("Inventario de Productos", 105, 10, { align: "center" });
+  
+    // Agregar la tabla al PDF
+    doc.autoTable({
+      startY: 20, // Mover la tabla hacia abajo
+      head: [tableColumn],
+      body: tableRows,
+    });
+  
+    // Guardar el documento PDF
+    doc.save('Inventario de Productos.pdf');
+  };  
 
   const renderHeader = () => {
     return (

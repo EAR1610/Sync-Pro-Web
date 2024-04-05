@@ -2,8 +2,8 @@ import sequelize from "../config/config.js";
 
 const reporteVentasController = {
 
-    // Listar reporte de ventas
-    getReporteVentasByProcedure: async (req, res) => {
+    // Listar reporte de ventas por procedimiento almacenado
+    getSalesReportByProcedure: async (req, res) => {
         try {
             const { fechaDesde, fechaHasta, codMoneda, rdTipo, vendedorId, bodegaId, contadorCredit } = req.body;                             
             const result = await sequelize.query(

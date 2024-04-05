@@ -6,14 +6,22 @@ const router = Router()
 
 router
     .route('/')
-    .get(checkAuth,pedidosController.listarPedidos)
+    .get(checkAuth,pedidosController.getOrders)
 
 router
     .route('/save')
-    .post(checkAuth,pedidosController.guardarPedido)
+    .post(checkAuth,pedidosController.saveOrder)
 
 router
     .route('/delete/:id')
-    .delete(checkAuth,pedidosController.eliminarPedido)
+    .post(checkAuth,pedidosController.deleteOrder)
+
+router
+    .route('/list/custom')
+    .get(checkAuth,pedidosController.getCustomOrder)
+
+router
+    .route('/list/seller/:id')
+    .get(checkAuth,pedidosController.getOrderByIdSeller)
 
 export default router;

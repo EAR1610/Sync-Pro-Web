@@ -5,15 +5,15 @@ import checkAuth from '../middleware/checkAuth.js';
 const router = Router()
 
 router
-    .route('/listarClientes')
-    .get(checkAuth,clientesController.listarClientes)
+    .route('/')
+    .get(checkAuth,clientesController.getCustomers)
 
 router
-    .route('/guardarCliente')
-    .post(checkAuth,clientesController.guardarCliente)
+    .route('/save')
+    .post(checkAuth,clientesController.saveCustomer)
 
 router
-    .route('/buscarClientePorId/:id')
-    .get(checkAuth,clientesController.buscarClientePorId)
+    .route('/id/:id')
+    .get(checkAuth,clientesController.getCustomerById)
 
 export default router;

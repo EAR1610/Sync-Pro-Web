@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
+import { InputTextarea } from 'primereact/inputtextarea';
 
 import clienteAxios from '../config/clienteAxios';
 import useAuth from "../hook/useAuth"
@@ -10,9 +12,9 @@ const FinishOrder = ({ order, idCustomer, idSeller, total,
     observation, estimatedDate, resetState, handleCloseDialog,
     mostrarAlertaFlotante }) => {
 
-    const [seller, setSeller] = useState([]);
-    const [customer, setCustomer] = useState([]);
-    const fechaFormateada = new Date().toISOString().split('T')[0];
+    const [seller, setSeller] = useState({});
+    const [customer, setCustomer] = useState({});
+    const currentDateFormatted = new Date().toISOString().split('T')[0];
 
     const { auth } = useAuth();
 
@@ -40,7 +42,7 @@ const FinishOrder = ({ order, idCustomer, idSeller, total,
 
                 const [responseSeller, responseCustomer] = await Promise.all([
                     clienteAxios.get(`/vendedor/id/${idSeller}`, config),
-                    clienteAxios.get(`/cliente/buscarClientePorId/${idCustomer}`, config)
+                    clienteAxios.get(`/cliente/id/${idCustomer}`, config)
                 ]);
 
                 if (!responseSeller || !responseCustomer) {
@@ -65,9 +67,12 @@ const FinishOrder = ({ order, idCustomer, idSeller, total,
     const handleCompleteClick = async () => {
         try {
             const idPedido = await saveOrder();
+            if (!idPedido) {
+                throw new Error('No se pudo obtener el ID del pedido.');
+            }
+
             await saveOrderDetail(idPedido);
 
-            // Resetea el estado de la aplicación
             resetState();
             handleCloseDialog();
             mostrarAlertaFlotante('success', 'Pedido registrado satisfactoriamente.');
@@ -93,7 +98,7 @@ const FinishOrder = ({ order, idCustomer, idSeller, total,
 
             const dataPedido = {
                 "CodCliente": idCustomer,
-                "Fecha": fechaFormateada,
+                "Fecha": currentDateFormatted,
                 "Observaciones": observation,
                 "IdUsuario": auth.id,
                 "FechaEntrega": estimatedDate,
@@ -106,12 +111,12 @@ const FinishOrder = ({ order, idCustomer, idSeller, total,
             // Guardar el pedido en la tabla de pedidos
             const responsePedido = await clienteAxios.post('/pedidos/save', dataPedido, config);
 
-            if (!responsePedido || responsePedido.data.pedidoGuardado.id === 0) {
+            if (!responsePedido || responsePedido.data.savedOrder.id === 0) {
                 throw new Error('No se pudo obtener el ID del pedido.');
             }
 
             // Extraer el ID del pedido de la respuesta del servidor
-            const idPedido = responsePedido.data.pedidoGuardado.id;
+            const idPedido = responsePedido.data.savedOrder.id;
             return idPedido;
         } catch (error) {
             console.error('Hubo un error:', error);
@@ -157,21 +162,52 @@ const FinishOrder = ({ order, idCustomer, idSeller, total,
     // Mostrar la tabla con los productos de la orden
     return (
         <div className="card ">
-            <div className="flex flex-col items-center sm:items-start">
-                <div className="mt-4"><span className="font-bold">Vendedor: </span>{seller && seller.Nombre}</div>
-                <div className="mt-4"><span className="font-bold">Cliente: </span>{customer && customer.Nombre}</div>
-                <div className="mt-4 flex items-center">
-                    <span className="font-bold">Total: Q </span>
-                    <span>. {total.toFixed(2)}</span>
+            <div className='mt-2'>
+                <div className='flex justify-between items-center m-2'>
+                    <label htmlFor="lbl_seller" className="font-bold">Vendedor:</label>
+                    <InputText id="txt_seller" value={seller.Nombre || ''} required className='w-6' />
                 </div>
-                <div className="mt-4"><span className="font-bold">Observaciones:</span></div>
-                <div className="mt-2">{observation} </div>
+                <div className='flex justify-between items-center m-2'>
+                    <label htmlFor="lbl_customer" className="font-bold">Cliente:</label>
+                    <InputText id="txt_customer" value={customer.Nombre || ''} required className='w-6' />
+                </div>
+                <div className='flex justify-between items-center m-2'>
+                    <label htmlFor="lbl_total" className="font-bold">Total: Q</label>
+                    <InputText id="txt_total" value={total ? total.toFixed(2) : ''} required className='w-6' />
+                </div>
+                <div className='flex justify-between items-center m-2'>
+                    <label htmlFor="lbl_estimatedDate" className="font-bold">Fecha de Entrega:</label>
+                    <InputText
+                        id="txt_estimatedDate"
+                        value={estimatedDate ? estimatedDate.toLocaleDateString() : ''}
+                        required className='w-6'
+                    />
+                </div>
+                <div className='flex justify-between items-center m-2'>
+                    <label htmlFor="lbl_observation" className="font-bold">Observaciones:</label>
+                    <InputTextarea id="observaciones" value={observation} rows={2} cols={35} readOnly />
+                </div>
             </div>
             <div className="card flex flex-wrap justify-content-center gap-3 mt-4">
-                <Button className="text-white text-sm bg-green-500 p-3 rounded-md font-bold" label="Completar" onClick={() => handleCompleteClick()} />
+                <Button
+                    className="text-white text-sm bg-green-500 p-3 rounded-md font-bold"
+                    label="Completar"
+                    onClick={() => handleCompleteClick()}
+                />
             </div>
             <div className="mt-4">
-                <DataTable value={order}>
+                <DataTable
+                    value={order}
+                    size={'small'}
+                    showGridlines
+                    paginator
+                    rows={5}
+                    rowsPerPageOptions={[5, 10, 25, 50]}
+                    selectionMode="single"
+                    scrollHeight="250px"
+                    removableSort
+                    className='border border-black-200 divide-y divide-black-200 mt-4'
+                >
                     <Column field="Descripcion" header="Descripción" />
                     <Column field="unidades" header="Unidades" />
                     <Column field="total" header="Total" />
@@ -183,4 +219,3 @@ const FinishOrder = ({ order, idCustomer, idSeller, total,
 }
 
 export default FinishOrder;
-

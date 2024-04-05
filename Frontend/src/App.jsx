@@ -11,6 +11,7 @@ import LoginPage from './pages/LoginPage'
 import VentasPage from './pages/VentasPage'
 import CajaPage from './pages/CajaPage'
 import Orders from './pages/Orders'
+import Sellers from './pages/Sellers'
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
                     <Route path='ventas' element={ <VentasPage /> } />
                     <Route path='cajas' element={ <CajaPage /> } />
                     <Route path='pedidos' element={<Orders />} />
+                    <Route path='vendedores' element={<Sellers />} />
                   </Route>
               </Routes>          
             </DashboardProvider>

@@ -2,8 +2,9 @@ import sequelize from "../config/config";
 import Vendedores from "../models/vendedores";
 
 const vendedorController = {
-    // Listar Vendedores
-    getVendedores: async (req, res) => {
+
+    // Listar Vendedores con id (value) y nombre
+    getIdAndNameSellers: async (req, res) => {
         try {
             const result = await sequelize.query("select id as value, nombre from Vendedores",
                 {
@@ -19,8 +20,9 @@ const vendedorController = {
             res.status(500).json({ error: "Error interno del servidor." });
         }
     },
-    // Listar Vendedores
-    listarVendedores: async (req, res) => {
+
+    // Listar Vendedores con todos los campos
+    getSellers: async (req, res) => {
         try {
             const result = await Vendedores.findAll();
             if (result.length === 0)
@@ -34,18 +36,15 @@ const vendedorController = {
     },
 
     //Guardar un nuevo vendedor
-    guardarVendedor: async (req, res) => {
-
+    saveSeller: async (req, res) => {
         try {
-            const nuevoVendedor = req.body;
-            const vendedorGuardado = await Vendedores.create(nuevoVendedor);
-            //mensaje de exito
-            if (vendedorGuardado)
+            const newSeller = req.body;
+            const savedSeller = await Vendedores.create(newSeller);
+            if (savedSeller)
                 return res.status(200).json({
                     message: 'Vendedor guardado correctamente.'
                 });
-
-            res.status(200).json(vendedorGuardado);
+            res.status(200).json(savedSeller);
         } catch (error) {
             console.error('Error al ejecutar la consulta:', error);
             res.status(500).json({ message: 'Error interno del servidor. ' + error })
@@ -53,14 +52,18 @@ const vendedorController = {
     },
 
     //Eliminar un vendedor
-    eliminarVendedor: async (req, res) => {
+    /**
+     *  ! No existe el campo Anulado en la tabla Vendedores
+     *  TODO: Crear campo Anulado en la tabla Vendedores
+     */
+    deleteSeller: async (req, res) => {
         try {
             const { id } = req.params;
-            //no eliminamos solo pasamos el campo anulado a true
-            const vendedorEliminado = await Vendedores.update({ Anulado: true }, {
+            // Cambiar el campo Anulado a true
+            const deletedSeller = await Vendedores.update({ Anulado: true }, {
                 where: { id }
             });
-            if (vendedorEliminado)
+            if (deletedSeller)
                 return res.status(200).json({ message: 'Vendedor eliminado correctamente.' }
                 );
             res.status(404).json({ message: 'Vendedor no encontrado.' });
@@ -70,8 +73,8 @@ const vendedorController = {
         }
     },
 
-    // Buscar vendedor por ID
-    getVendedorById: async (req, res) => {
+    // Buscar vendedor por ID  getVendedorById
+    getSellerById: async (req, res) => {
         try {
             const { id } = req.params;
             const result = await Vendedores.findByPk(id);

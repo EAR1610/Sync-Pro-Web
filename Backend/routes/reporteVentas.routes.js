@@ -6,6 +6,6 @@ const router = Router();
 
 router
     .route('/general')
-    .post(reporteVentasController.getReporteVentasByProcedure);
+    .post(reporteVentasController.getSalesReportByProcedure);
 
 export default router;

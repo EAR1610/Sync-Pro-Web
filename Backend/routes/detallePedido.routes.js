@@ -6,14 +6,18 @@ const router = Router();
 
 router
     .route('/')
-    .get(checkAuth, detallePedidosController.listarDetallePedidos); 
+    .get(checkAuth, detallePedidosController.getOrderDetails); 
 
 router
     .route('/save')
-    .post(checkAuth, detallePedidosController.guardarDetallePedido);
+    .post(checkAuth, detallePedidosController.saveOrderDetails);
 
 router
     .route('/delete/:id')
-    .delete(checkAuth, detallePedidosController.eliminarDetallePedido);
+    .delete(checkAuth, detallePedidosController.deleteOrderDetails);
+
+router
+    .route('/list/:id')
+    .get(checkAuth, detallePedidosController.getOrderDetailsById);
     
 export default router;

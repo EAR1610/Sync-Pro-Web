@@ -6,19 +6,19 @@ const router = Router();
 
 router
     .route('/')
-    .get(checkAuth, inventarioController.getInventario);
+    .get(checkAuth, inventarioController.getInventory);
 
 router
     .route('/barras/:id')
-    .get(checkAuth, inventarioController.getInventarioByBarras);
+    .get(checkAuth, inventarioController.getInventoryByBarcode);
 
 router
     .route('/personalizado')
-    .get(checkAuth, inventarioController.getInventarioPersonalizado);
+    .get(checkAuth, inventarioController.getCustomInventory);
 
 router
     .route('/personalizado/:id')
-    .get(checkAuth, inventarioController.getInventarioPersonalizadoByBarras);
+    .get(checkAuth, inventarioController.getCustomInventoryByBarcode);
 
 
 export default router;
