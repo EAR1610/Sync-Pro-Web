@@ -23,14 +23,13 @@ const DashboardProvider = ({ children }) => {
                 const config = {
                     Headers: {
                         "Content-Type": "application/json",
-                        Autorization: `Bearer ${token}`
+                        Authorization: `Bearer ${token}`
                     }
                 }
-
-                const { data } = await clienteAxios.get('/dashboard', config);                
-                setInventario(data);
+                const response = await clienteAxios.get('/dashboard', config);              
+                setInventario(response.data);
             } catch( error ){
-                console.log(error);
+                console.log(error)
             }
         }
         obtenerProductos();

@@ -27,7 +27,6 @@ const RutaProtegida = () => {
                                 <SidebarItem icon={<img src={DashboardIcon} alt="Reportes" width={20}/>} text='Reportes' />
                                 <SidebarItem icon={<img src={DashboardIcon} alt="Parámetros" width={20}/>} text='Parámetros' />
                                 <SidebarItem icon={<img src={DashboardIcon} alt="Utilidades" width={20}/>} text='Utilidades' />
-
                             </Sidebar>
 
                            <main className='p-3 flex-1 '>

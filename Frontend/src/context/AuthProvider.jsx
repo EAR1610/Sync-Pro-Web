@@ -27,10 +27,16 @@ const AuthProvider = ({ children }) => {
         }
 
         try {
-            const { data } = await clienteAxios('auth/perfil', config);            
-            setAuth(data);
+          const response = await clienteAxios('auth/perfil', config);
+          setAuth(response.data);
         } catch (error) {
+          if (error.response && error.response.status === 401) {            
+            localStorage.removeItem('token');
             setAuth({});
+          } else {
+            localStorage.removeItem('token');
+            setAuth({});
+          }
         }
 
         setCargando(false);
