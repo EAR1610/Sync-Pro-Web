@@ -5,8 +5,10 @@ import useAuth from '../hook/useAuth';
 import clienteAxios from '../config/clienteAxios';
 import Alerta from '../components/Alerta';
 import { Dropdown } from 'primereact/dropdown';
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
 
-const LoginPage = () => {
+const LoginPage = ({ toast }) => {
   const [username, setUsername] = useState(null);
   const [usernames, setUsernames] = useState([])
   const [password, setPassword] = useState('');  
@@ -51,12 +53,24 @@ const LoginPage = () => {
       localStorage.setItem('token', data.token);
       setAuth(data.user);
       localStorage.setItem('auth', JSON.stringify(data.user));
+      toast.current.show({
+        severity: 'success',
+        summary: 'Inicio de sesión exitoso',
+        detail: `Bienvenido de nuevo, ${username.name}`,
+        life: 5000
+      });
       navigate('/dashboard');
     } catch (error) {
       setAlerta({
         msg: 'Hubo un error al iniciar sesión',
         error: true
       })
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error de inicio de sesión',
+        detail: 'Los datos de inicio de sesión son incorrectos.',
+        life: 5000
+      });
     }
       
   };

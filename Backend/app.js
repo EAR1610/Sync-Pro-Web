@@ -12,7 +12,11 @@ import cajaRoutes from './routes/caja.routes';
 import clientesRutas from './routes/cliente.routes';
 import pedidosRutas from './routes/pedidos.routes';
 import detallePedidosRoutes from './routes/detallePedido.routes';
-  
+import reporteGananciasRoutes from './routes/reporteGanancias.routes';
+import categoriaClienteRoutes from './routes/categoriaCliente.routes';
+import localidadRoutes from './routes/localidad.routes';
+import monedasRoutes from './routes/monedas.routes';
+
 sequelize.sync({ force: false }) // Utiliza { force: true } para recrear las tablas en cada reinicio
   .then(() => {
     console.log('Tablas sincronizadas con la base de datos');
@@ -27,7 +31,7 @@ app.use(cors());
 app.get('/', (req, res) => {
     res.json({
         author: 'hugo',
-        descripcion:'hola mundo'
+        descripcion:'hola mundo',
     })
 })
 
@@ -40,5 +44,9 @@ app.use('/caja', cajaRoutes)
 app.use('/cliente', clientesRutas);
 app.use('/pedidos', pedidosRutas);
 app.use('/detalle_pedidos', detallePedidosRoutes);
+app.use('/reporte_ganancias', reporteGananciasRoutes)
+app.use('/categoria_cliente', categoriaClienteRoutes)
+app.use('/localidad', localidadRoutes)
+app.use('/moneda', monedasRoutes)
 
 export default app;

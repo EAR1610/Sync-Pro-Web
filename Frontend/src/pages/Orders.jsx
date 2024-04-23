@@ -94,7 +94,6 @@ const Orders = () => {
                 setFilteredProducts(inventoryData);
                 setFilteredSellers(sellerData);
                 setFilteredCustomers(customerData);
-                console.log(inventoryData)
             } catch (error) {
                 console.error('Hubo un error:', error);
             }
@@ -368,7 +367,7 @@ const Orders = () => {
             let url = '';
             if (selectedSeller.nombre !== 'Sin especificar' && selectedSeller !== null) {
                 url = `/pedidos/list/seller/${selectedSeller}`;
-            } else if (selectedSeller.nombre === 'Sin especificar'){
+            } else if (selectedSeller.nombre === 'Sin especificar') {
                 url = '/pedidos/list/custom';
             } else if (selectedSeller === null) {
                 mostrarAlertaFlotante('error', 'Seleccione una opción válida');
@@ -379,7 +378,13 @@ const Orders = () => {
                 throw new Error('Error al cargar los pedidos.');
             }
 
-            const { data: ordersData } = response;
+            const { data: ordersData } = response || {};
+
+            // Si no hay pedidos, mostrar una alerta y salir de la función
+            if (ordersData.length === 0) {
+                mostrarAlertaFlotante('error', 'El vendedor aún no tiene pedidos.');
+                return;
+            }
 
             // Ordenar los datos por fecha de pedido (más antigua a más reciente)
             ordersData.sort((a, b) => {
@@ -387,14 +392,21 @@ const Orders = () => {
                 return new Date(yearA, monthA - 1, dayA);
             });
 
-            setOrders(ordersData);
+            setOrders(ordersData); 
         } catch (error) {
-            console.error('Hubo un error:', error);
+            if (error.response && error.response.status === 404) {
+                mostrarAlertaFlotante('warn', 'El vendedor aún no tiene pedidos.');
+            } else {
+                console.error('Hubo un error:', error);
+            }
         } finally {
             setLoading(false);
         }
     };
 
+    /**
+     * TODO: Cuando se filtra y el vendedor no tiene pedidos, se muestra un error en consola.
+     */
     return (
         <div>
             <TabView>
@@ -548,8 +560,8 @@ const Orders = () => {
                         <div className="mt-2">Filtrar pedidos por vendedor</div>
                         <div className="flex gap-3 mt-2">
                             <Dropdown
-                                value={selectedSeller} 
-                                onChange={(e) => setSelectedSeller(e.value)} 
+                                value={selectedSeller}
+                                onChange={(e) => setSelectedSeller(e.value)}
                                 options={[{ nombre: 'Sin especificar' }, ...filteredSellers]}
                                 optionLabel="nombre"
                                 placeholder="Selecciona un vendedor"

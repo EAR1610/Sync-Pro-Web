@@ -16,4 +16,12 @@ router
     .route('/id/:id')
     .get(checkAuth,clientesController.getCustomerById)
 
+router
+    .route('/update/:id')
+    .put(checkAuth,clientesController.updateCustomer)
+
+router
+    .route('/balances')
+    .get(checkAuth,clientesController.getCustomerBalances)
+
 export default router;

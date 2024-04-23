@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+ import React, { useState, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
@@ -15,11 +15,11 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import "jspdf-autotable";
 
-import clienteAxios from "../config/clienteAxios";
+import clienteAxios from "../../config/clienteAxios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const VentasPage = () => {
+const SalesReport = () => {
   const [startDate, setStartDate] = useState(null);
   const [finalDate, setFinalDate] = useState(null);
   const [sale, setSale] = useState([])
@@ -344,4 +344,4 @@ const VentasPage = () => {
   );
 }
 
-export default VentasPage
+export default SalesReport

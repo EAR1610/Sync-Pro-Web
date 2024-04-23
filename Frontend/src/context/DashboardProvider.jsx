@@ -18,8 +18,8 @@ const DashboardProvider = ({ children }) => {
         const obtenerProductos = async () => {
             try {
                 const token = localStorage.getItem('token');                
-                if( !token ) return  navigate('/login');
-
+                if( !token || !auth == false ) return  navigate('/login');
+                
                 const config = {
                     Headers: {
                         "Content-Type": "application/json",
@@ -29,7 +29,7 @@ const DashboardProvider = ({ children }) => {
                 const response = await clienteAxios.get('/dashboard', config);              
                 setInventario(response.data);
             } catch( error ){
-                console.log(error)
+                localStorage.removeItem('token');                
             }
         }
         obtenerProductos();
