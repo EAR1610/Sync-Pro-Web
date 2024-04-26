@@ -20,7 +20,11 @@ router
     .post(vendedorController.saveSeller);
 
 router
-    .route('/delete/:id')
-    .delete(vendedorController.deleteSeller);
+    .route('/hide/:id')
+    .put(vendedorController.deleteSeller);
+
+router
+    .route('/update/:id')
+    .put(vendedorController.updateSeller);
     
 export default router;

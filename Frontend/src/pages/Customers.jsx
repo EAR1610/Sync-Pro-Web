@@ -1,6 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { TabView, TabPanel } from 'primereact/tabview';
-import { Toast } from 'primereact/toast';
 import AddCustomer from '../components/TabPanel_Customers/AddCustomer.jsx';
 import ListCustomers from '../components/TabPanel_Customers/ListCustomers.jsx';
 

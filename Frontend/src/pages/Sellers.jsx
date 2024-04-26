@@ -8,6 +8,7 @@ import { Column } from 'primereact/column';
 import { FilterMatchMode } from 'primereact/api';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils';
+import { Dialog } from 'primereact/dialog';
 
 import clienteAxios from '../config/clienteAxios';
 import SellerDetail from '../components/SellerDetail';
@@ -47,6 +48,9 @@ const Sellers = () => {
     const toast = useRef(null);
     const [loading, setLoading] = useState(true);
     const [sellerDialog, setSellerDialog] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [update, setUpdate] = useState(0);
 
     // Cargar datos iniciales
     useEffect(() => {
@@ -89,7 +93,7 @@ const Sellers = () => {
         };
         verificarAcceso();
         getSellers();
-    }, []);
+    }, [activeIndex, update]);
 
     // Mostrar una alerta flotante
     const showFloatingAlert = (tipo, mensaje) => {
@@ -102,7 +106,22 @@ const Sellers = () => {
 
     // Limpiar los estados una vez guardado el vendedor
     const resetState = () => {
-        setSeller({});
+        setSeller({
+            Cedula: '',
+            Nombre: '',
+            Telefono: '',
+            Celular: '',
+            Direccion: '',
+            Comision: 0,
+            Inhabilitado: 0,
+            Correo: '',
+            Comision2: 0,
+            DiasdeGracia: 0,
+            TipoComision: 0,
+            Meta: 0,
+            PorcXMeta: 0,
+            PorProdoPorc: 0
+        });
     };
 
     // Manejar cambios en los campos del vendedor
@@ -168,19 +187,34 @@ const Sellers = () => {
                 "PorProdoPorc": 1
             }
 
-            console.log(dataSeller);
-            const response = await clienteAxios.post(`/vendedor/save`, dataSeller, config);
+            let response;
+            try {
+                if (seller.Id) {
+                    // Actualizar vendedor existente
+                    response = await clienteAxios.put(`/vendedor/update/${seller.Id}`, dataSeller, config);
+                } else {
+                    // Crear nuevo vendedor
+                    response = await clienteAxios.post(`/vendedor/save`, dataSeller, config);
+                }
+            } catch (error) {
+                console.error('Hubo un error al hacer la solicitud:', error);
+                showFloatingAlert('danger', 'Hubo un error al hacer la solicitud a la API.');
+                return;
+            }
 
-            if (!response) {
-                showFloatingAlert('danger', 'El vendedor no se pudo agregar.');
-                throw new Error('Error al guardar el vendedor.');
+            if (!response || response.status >= 400) {
+                showFloatingAlert('danger', 'El vendedor no se pudo agregar o actualizar.');
+                throw new Error('Error al guardar o actualizar el vendedor.');
+            } else if (seller.Id) {
+                showFloatingAlert('success', 'Vendedor actualizado correctamente.');
+                console.log('Vendedor actualizado:', response.data);
             } else {
                 showFloatingAlert('success', 'Vendedor agregado correctamente.');
+                console.log('Vendedor agregado:', response.data);
             }
-            resetState();
 
-            // Recargar la página
-            window.location.reload();
+            resetState();
+            setActiveIndex(1);
         } catch (error) {
             console.error('Hubo un error:', error);
         }
@@ -189,9 +223,25 @@ const Sellers = () => {
     // Plantilla de acciones en la tabla de vendedores
     const actionBodyTemplate = (rowData) => {
         return (
-            <React.Fragment>
-                <Button icon="pi pi-eye" rounded text raised severity="info" className="mr-2" onClick={() => viewSellerDetail(rowData)} />
-            </React.Fragment>
+            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                <Button
+                    icon="pi pi-eye"
+                    onClick={() => viewSellerDetail(rowData)}
+                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
+                />
+                <Button
+                    icon="pi pi-pencil"
+                    onClick={() => editSeller(rowData)}
+                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
+                    className='ml-1'
+                />
+                <Button
+                    icon="pi pi-trash"
+                    onClick={() => handleDeleteSellerClick(rowData)}
+                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
+                    className='ml-1'
+                />
+            </div>
         );
     };
 
@@ -217,14 +267,77 @@ const Sellers = () => {
         setSellerRecord(seller);
     }
 
+    // Redireccionar a la página de agregar vendedor para editarlo
+    const editSeller = (seller) => {
+        if (seller) {
+            setSeller(seller);
+            setActiveIndex(0);
+        }
+    }
+
+    // Abrir diálogo de confirmación para ocultar vendedor
+    const handleDeleteSellerClick = (seller) => {
+        setSelectedSeller(seller);
+        setShowDeleteDialog(true);
+    };
+
+    // Confirmar ocultar vendedor
+    const handleConfirmDelete = () => {
+        hideSeller(selectedSeller);
+        setShowDeleteDialog(false);
+        setUpdate(update + 1);
+    };
+
+    // Ocultar vendedor
+    const hideSeller = async (seller) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                return;
+            }
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                }
+            }
+
+            const response = await clienteAxios.put(`/vendedor/hide/${seller.Id}`, {}, config);
+
+            if (!response || response.status >= 400) {
+                showFloatingAlert('danger', 'El vendedor no se pudo ocultar.');
+                throw new Error('Error al ocultar el vendedor.');
+            } else {
+                showFloatingAlert('success', 'Vendedor ocultado correctamente.');
+            }
+
+            // Actualizar Tabpanel
+            setActiveIndex(1);
+        } catch (error) {
+            console.error('Hubo un error:', error);
+        }
+    }
+
+    const renderFooter = (name) => {
+        return (
+            <div>
+                <Button label="No" icon="pi pi-times" onClick={() => setShowDeleteDialog(false)} className="p-button-text" />
+                <Button label="Si" icon="pi pi-check" onClick={handleConfirmDelete} autoFocus />
+            </div>
+        );
+    }
+
     return (
         <div className="card">
-            <TabView>
-                <TabPanel header="Agregar">
-                    <Toast ref={toast} />
+            <Toast ref={toast} />
+            <TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
+                <TabPanel header={seller.Id ? 'Editar' : 'Agregar'}>
                     <div className="flex justify-content-center mt-4">
                         <div className="card flex flex-col justify-content-center gap-3 w-full md:w-3/4">
-                            <h1 className="col-span-2 text-center font-bold text-4xl">Registrar nuevo vendedor</h1>
+                            <h1 className="col-span-2 text-center font-bold text-4xl">
+                                {seller.Id ? 'Editar Vendedor' : 'Registrar Nuevo Vendedor'}
+                            </h1>
                             <div className="flex flex-wrap gap-3 mb-4 mt-4">
                                 <div className="flex-auto">
                                     <label htmlFor="Cedula" className="font-bold block mb-2">
@@ -269,12 +382,20 @@ const Sellers = () => {
                                 <div className="flex-shrink-0">
                                     <Button
                                         className='text-white text-sm bg-sky-600 p-3 rounded-md font-bold md:mt-0'
-                                        label="Guardar"
-                                        icon="pi pi-check"
+                                        label={seller.Id ? 'Guardar cambios' : 'Guardar'}
                                         loading={loading}
                                         onClick={checkSeller}
                                         style={{ maxWidth: '10rem' }}
                                     />
+                                    {seller.Id && (
+                                        <Button
+                                            className='text-white text-sm bg-red-600 p-3 rounded-md font-bold md:mt-0 ml-2'
+                                            label="Cancelar"
+                                            icon="pi pi-times"
+                                            onClick={resetState}
+                                            style={{ maxWidth: '10rem' }}
+                                        />
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -313,7 +434,7 @@ const Sellers = () => {
                             removableSort
                             className='border border-black-200 divide-y divide-black-200'
                         >
-                            <Column body={actionBodyTemplate} exportable={false}></Column>
+                            <Column body={actionBodyTemplate} header="Acciones" exportable={false} style={{ width: '150px' }}></Column>
                             <Column field="Cedula" header="DPI"></Column>
                             <Column field="Nombre" header="Vendedor"></Column>
                             <Column field="Celular" header="Celular" style={{ width: '10%' }}></Column>
@@ -329,6 +450,17 @@ const Sellers = () => {
                     />}
                 </TabPanel>
             </TabView>
+            <Dialog
+                header="Confirmación"
+                visible={showDeleteDialog}
+                style={{ width: '25vw', height: '16vw' }}
+                footer={renderFooter('displayBasic')}
+                onHide={() => setShowDeleteDialog(false)}
+            >
+                <div style={{ wordWrap: 'break-word' }}>
+                    ¿Estás seguro de que quieres eliminar este vendedor? Esta acción no se puede deshacer.
+                </div>
+            </Dialog>
         </div>
     )
 }

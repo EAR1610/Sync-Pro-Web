@@ -132,10 +132,31 @@ const CajaPage = () => {
     };
 
     const actionBodyTemplate = (rowData) => {
+        // return (
+        //     <React.Fragment>
+        //         <Button icon="pi pi-eye" rounded text raised severity="info" className="mr-2" onClick={() => editCierre(rowData)} />
+        //     </React.Fragment>
+        // );
         return (
-            <React.Fragment>
-                <Button icon="pi pi-eye" rounded text raised severity="info" className="mr-2" onClick={() => editCierre(rowData)} />
-            </React.Fragment>
+            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                <Button
+                    icon="pi pi-eye"
+                    onClick={() => editCierre(rowData)}
+                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
+                />
+                <Button
+                    icon="pi pi-pencil"
+                    onClick={() => alert('Opción en desarrollo')}
+                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
+                    className='ml-1'
+                />
+                <Button
+                    icon="pi pi-trash"
+                    onClick={() => alert('Opción en desarrollo')}
+                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
+                    className='ml-1'
+                />
+            </div>
         );
     };
 
@@ -318,7 +339,7 @@ const CajaPage = () => {
                                 scrollable
                                 scrollHeight="500px"
                             >
-                                <Column body={actionBodyTemplate} exportable={false} style={{ width: '4rem' }}></Column>
+                                <Column body={actionBodyTemplate} header="Acciones" exportable={false} style={{ width: '4rem' }}></Column>
 
                                 {columns.map((col, i) => (
                                     <Column key={`${col.field}-${i}`} field={col.field} header={col.header} />

@@ -46,25 +46,25 @@ const DashboardPage = () => {
     const cargarProductos = async () => {
       try {
         const token = localStorage.getItem('token');
-        if( !token ) {
-            setCargando(false);
-            return;
+        if (!token) {
+          setCargando(false);
+          return;
         }
 
         const config = {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            }
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          }
         }
         const response = await clienteAxios.get('/dashboard/personalizado', config);
         if (!response) {
           throw new Error('Error al cargar los productos');
         }
 
-        const {data} = await response;        
+        const { data } = await response;
         setLoading(false);
-        setProducts(data);        
+        setProducts(data);
       } catch (error) {
         console.error('Hubo un error:', error);
       }
@@ -90,9 +90,25 @@ const DashboardPage = () => {
 
   const actionBodyTemplate = (rowData) => {
     return (
-      <React.Fragment>
-        <Button icon="pi pi-eye" rounded text raised severity="info" className="mr-2" onClick={() => editProduct(rowData)} />        
-      </React.Fragment>
+      <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+        <Button
+          icon="pi pi-eye"
+          onClick={() => editProduct(rowData)}
+          style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
+        />
+        <Button
+          icon="pi pi-pencil"
+          onClick={() => alert('Opción en desarrollo')}
+          style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
+          className='ml-1'
+        />
+        <Button
+          icon="pi pi-trash"
+          onClick={() => alert('Opción en desarrollo')}
+          style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
+          className='ml-1'
+        />
+      </div>
     );
   };
 
@@ -121,11 +137,11 @@ const DashboardPage = () => {
       console.error('No hay productos para generar el reporte');
       return;
     }
-  
+
     const doc = new jsPDF();
     const tableColumn = ["Barras", "Descripcion", "Existencia", "Costo", "PrecioFinal"];
     const tableRows = [];
-  
+
     // Agregar los datos de los productos a las filas de la tabla
     products.forEach(product => {
       const rowData = [
@@ -137,27 +153,27 @@ const DashboardPage = () => {
       ];
       tableRows.push(rowData);
     });
-  
+
     // Agregar título al PDF
     doc.text("Inventario de Productos", 105, 10, { align: "center" });
-  
+
     // Agregar la tabla al PDF
     doc.autoTable({
       startY: 20, // Mover la tabla hacia abajo
       head: [tableColumn],
       body: tableRows,
     });
-  
+
     // Guardar el documento PDF
     doc.save('Inventario de Productos.pdf');
-  };  
+  };
 
   const renderHeader = () => {
     return (
       <div className="flex justify-content-space-between" >
         <div className="flex-1 justify-content-end">
           <span className="">
-            <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar" className='border rounded-lg'/>
+            <InputText value={globalFilterValue} onChange={onGlobalFilterChange} placeholder="Buscar" className='border rounded-lg' />
           </span>
           <div className='mt-2'>
             <Button className='mr-1 text-white text-sm bg-green-600 p-3 rounded-md uppercase font-bold' type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportToExcel} data-pr-tooltip="XLS" />
@@ -176,7 +192,7 @@ const DashboardPage = () => {
 
         <DataTable
           dataKey="Barras"
-          size='small'          
+          size='small'
           header={header}
           filters={filters}
           loading={loading}
@@ -194,15 +210,15 @@ const DashboardPage = () => {
           scrollHeight="500px"
           globalFilter={globalFilterValue}
           className='border border-black-200 divide-y divide-black-200'
-        >        
-          <Column body={actionBodyTemplate} exportable={false} style={{ width: '4rem' }}></Column>
+        >
+          <Column body={actionBodyTemplate} header="Acciones" exportable={false} style={{ width: '4rem' }}></Column>
           {columns.map((col, i) => (
             <Column key={`${col.field}-${i}`} field={col.field} header={col.header} sortable />
           ))}
         </DataTable>
 
       </div>
-      { productDialog && <Product productDialog={productDialog} product={registro} setProductDialog={setProductDialog} /> }
+      {productDialog && <Product productDialog={productDialog} product={registro} setProductDialog={setProductDialog} />}
     </div>
   );
 }

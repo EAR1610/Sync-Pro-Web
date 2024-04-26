@@ -7,8 +7,10 @@ import { Column } from 'primereact/column';
 import { FilterMatchMode } from 'primereact/api';
 import { classNames } from 'primereact/utils';
 import { InputText } from 'primereact/inputtext';
+import { SelectButton } from 'primereact/selectbutton';
 
 import clienteAxios from '../../config/clienteAxios';
+import CustomerDetail from './CustomerDetail';
 
 const ListCustomers = () => {
 
@@ -75,9 +77,25 @@ const ListCustomers = () => {
     // Plantilla de acciones en la tabla de clientes
     const actionBodyTemplate = (rowData) => {
         return (
-            <React.Fragment>
-                <Button icon="pi pi-eye" rounded text raised severity="info" className="mr-2" onClick={() => viewSellerDetail(rowData)} />
-            </React.Fragment>
+            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                <Button
+                    icon="pi pi-eye"
+                    onClick={() => viewCustomerDetail(rowData)}
+                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
+                />
+                <Button
+                    icon="pi pi-pencil"
+                    onClick={() => alert('Opción en desarrollo')}
+                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
+                    className='ml-1'
+                />
+                <Button
+                    icon="pi pi-trash"
+                    onClick={() => alert('Opción en desarrollo')}
+                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
+                    className='ml-1'
+                />
+            </div>
         );
     };
 
@@ -97,11 +115,11 @@ const ListCustomers = () => {
         return <i className={classNames('pi', { 'text-blue-500 pi-stop': rowData.Habilitado, 'text-blue-500 pi-check-square': !rowData.Habilitado })}></i>;
     };
 
-    // Abrir diálogo de detalle de vendedor
-    const viewCustomerDetail = (customer) => {
+    // Mostrar el diálogo de detalle de cliente
+    const viewCustomerDetail = (rowData) => {
+        setCustomerRecord(rowData);
         setCustomerDialog(true);
-        setCustomerRecord(customer);
-    }
+    };
 
     /**
      * TODO: Crear un componente para el diálogo de detalle de cliente
@@ -120,12 +138,14 @@ const ListCustomers = () => {
                     />
                 </div>
             </div>
+            <div className="flex justify-content-center mb-4">
+            </div>
             <div className="card mt-3">
                 <DataTable
                     dataKey="CodCliente"
                     value={customers}
-                    size={'small'}
-                    tableStyle={{ minWidth: '50rem' }}
+                    size='small'
+                    tableStyle={{ minWidth: '50rem'}}
                     loading={loading}
                     showGridlines
                     paginator
@@ -138,17 +158,24 @@ const ListCustomers = () => {
                     scrollHeight="500px"
                     globalFilter={globalCustomerFilterValue}
                     removableSort
-                    className='border border-black-200 divide-y divide-black-200'
+                    className='p-datatable-sm p-datatable-gridlines'
                 >
-                    <Column body={actionBodyTemplate} exportable={false}></Column>
+                    <Column body={actionBodyTemplate} header="Acciones" exportable={false}></Column>
                     <Column field="Cedula" header="DPI"></Column>
                     <Column field="Nombre" header="Cliente"></Column>
                     <Column field="Celular" header="Celular" style={{ width: '10%' }}></Column>
                     <Column field="Direccion" header="Direccion" ></Column>
-                    <Column field="Correo" header="Correo"></Column>
+                    <Column field="Email" header="Correo"></Column>
                     <Column body={verifiedBodyTemplate} field="Inhabilitado" header="Activo"></Column>
                 </DataTable>
             </div>
+            {customerDialog &&
+                <CustomerDetail
+                    customerDialog={customerDialog}
+                    setCustomerDialog={setCustomerDialog}
+                    customerRecord={customerRecord}
+                />
+            }
         </div>
     )
 };

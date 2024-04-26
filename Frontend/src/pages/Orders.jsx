@@ -332,10 +332,26 @@ const Orders = () => {
     // Plantilla de acciones en la tabla de pedidos
     const actionBodyTemplate = (rowData) => {
         return (
-            <React.Fragment>
-                <Button icon="pi pi-eye" rounded text raised severity="info" className="mr-2" onClick={() => viewOrderDetail(rowData)} />
-            </React.Fragment>
-        );
+            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+              <Button
+                icon="pi pi-eye"
+                onClick={() => viewOrderDetail(rowData)}
+                style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
+              />
+              <Button
+                icon="pi pi-pencil"
+                onClick={() => alert('Opción en desarrollo')}
+                style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
+                className='ml-1'
+              />
+              <Button
+                icon="pi pi-trash"
+                onClick={() => alert('Opción en desarrollo')}
+                style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
+                className='ml-1'
+              />
+            </div>
+          );
     };
 
     // Verificar búsqueda de pedidos
@@ -392,7 +408,7 @@ const Orders = () => {
                 return new Date(yearA, monthA - 1, dayA);
             });
 
-            setOrders(ordersData); 
+            setOrders(ordersData);
         } catch (error) {
             if (error.response && error.response.status === 404) {
                 mostrarAlertaFlotante('warn', 'El vendedor aún no tiene pedidos.');
@@ -597,7 +613,7 @@ const Orders = () => {
                             removableSort
                             className='border border-black-200 divide-y divide-black-200'
                         >
-                            <Column body={actionBodyTemplate} exportable={false}></Column>
+                            <Column body={actionBodyTemplate} header="Acciones" exportable={false}></Column>
                             <Column field="Id_pedido" header="Código"></Column>
                             <Column field="Vendedor" header="Vendedor"></Column>
                             <Column field="fecha_pedido" header="Fecha de Pedido" style={{ width: '10%' }}></Column>
