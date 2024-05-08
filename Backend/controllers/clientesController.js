@@ -6,7 +6,11 @@ const clientesController = {
     // Listar Clientes 
     getCustomers: async (req, res) => {
         try {
-            const result = await clientes.findAll();
+            const result = await clientes.findAll({
+                where: {
+                    Inhabilitado: 0
+                }
+            });
             if (result.length === 0) {
                 return res.status(404).json({ message: 'No se encontraron clientes.' });
             }
@@ -117,6 +121,62 @@ const clientesController = {
             } else {
                 return res.status(404).json({ message: 'No se encontraron clientes.' });
             }
+        } catch (error) {
+            console.error('Error al ejecutar la consulta:', error);
+            res.status(500).json({ message: 'Error interno del servidor.' })
+        }
+    },
+
+    // Eliminar/ocultar un cliente
+    deleteCustomer: async (req, res) => {
+        try {
+            const { CodCliente } = req.params;
+            // Cambiar el campo Inhabilitado a true
+            const deletedCustomer = await clientes.update({ InHabilitado: true }, {
+                where: { CodCliente }
+            });
+            if (deletedCustomer) {
+                return res.status(200).json({ message: 'Cliente ocultado correctamente.' });
+            } else {
+                return res.status(404).json({ message: 'Cliente no encontrado.' });
+            }
+        } catch (error) {
+            console.error('Error al ocultar el cliente:', error);
+            return res.status(500).json({ message: 'Error interno del servidor.' });
+        }
+    },
+
+    // Recuperar un cliente
+    recoverCustomer: async (req, res) => {
+        try {
+            const { CodCliente } = req.params;
+            // Cambiar el campo Inhabilitado a false
+            const recoveredCustomer = await clientes.update({ InHabilitado: false }, {
+                where: { CodCliente }
+            });
+            if (recoveredCustomer) {
+                return res.status(200).json({ message: 'Cliente recuperado correctamente.' });
+            } else {
+                return res.status(404).json({ message: 'Cliente no encontrado.' });
+            }
+        } catch (error) {
+            console.error('Error al recuperar el cliente:', error);
+            return res.status(500).json({ message: 'Error interno del servidor.' });
+        }
+    },
+
+    // Listar clientes inactivos
+    getInactiveCustomers: async (req, res) => {
+        try {
+            const result = await clientes.findAll({
+                where: {
+                    Inhabilitado: 1
+                }
+            });
+            if (result.length === 0) {
+                return res.status(404).json({ message: 'No se encontraron clientes inactivos.' });
+            }
+            res.status(200).json(result);
         } catch (error) {
             console.error('Error al ejecutar la consulta:', error);
             res.status(500).json({ message: 'Error interno del servidor.' })

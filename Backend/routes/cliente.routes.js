@@ -24,4 +24,16 @@ router
     .route('/balances')
     .get(checkAuth,clientesController.getCustomerBalances)
 
-export default router;
+router
+    .route('/hide/:CodCliente')
+    .put(checkAuth,clientesController.deleteCustomer)
+
+router
+    .route('/recover/:CodCliente')
+    .put(checkAuth,clientesController.recoverCustomer)
+
+router
+    .route('/inactive')
+    .get(checkAuth,clientesController.getInactiveCustomers)
+    
+export default router;

@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
+import { Toast } from 'primereact/toast';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { FilterMatchMode } from 'primereact/api';
-import { classNames } from 'primereact/utils';
-import { InputText } from 'primereact/inputtext';
 import { Dialog } from 'primereact/dialog';
-import { Toast } from 'primereact/toast';
+import { FilterMatchMode } from 'primereact/api';
 
 import clienteAxios from '../../config/clienteAxios';
 import CustomerDetail from './CustomerDetail';
-import InactiveCustomers from './InactiveCustomers';
+import Customers from '../../pages/Customers';
 
-const ListCustomers = (props) => {
+const InactiveCustomers = (props) => {
 
     // Datos
     const [customers, setCustomers] = useState([]);
@@ -31,7 +30,7 @@ const ListCustomers = (props) => {
     const toast = useRef(null);
     const [loading, setLoading] = useState(true);
     const [customerDialog, setCustomerDialog] = useState(false);
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showRecoverDialog, setShowRecoverDialog] = useState(false);
 
     // Cargar datos iniciales
     useEffect(() => {
@@ -58,7 +57,7 @@ const ListCustomers = (props) => {
                     }
                 };
 
-                const response = await clienteAxios.get('/cliente', config);
+                const response = await clienteAxios.get('/cliente/inactive', config);
 
                 if (!response) {
                     throw new Error('Error al cargar los vendedores.');
@@ -74,7 +73,7 @@ const ListCustomers = (props) => {
         };
         verificarAcceso();
         getCustomers();
-    }, [props.reloadCustomers]); // Se ejecuta cada vez que se actualiza reloadCustomers
+    }, [props.reloadCustomers]);
 
     // Plantilla de acciones en la tabla de clientes
     const actionBodyTemplate = (rowData) => {
@@ -86,15 +85,9 @@ const ListCustomers = (props) => {
                     style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
                 />
                 <Button
-                    icon="pi pi-pencil"
-                    onClick={() => handleEditCustomer(rowData)}
-                    style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
-                    className='ml-1'
-                />
-                <Button
-                    icon="pi pi-trash"
-                    onClick={() => handleDeleteCustomerClick(rowData)}
-                    style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
+                    label="Activar"
+                    onClick={() => handleRecoverCustomerClick(rowData)}
+                    style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#D59B14', color: '#FFFFFF', width: '75px' }}
                     className='ml-1'
                 />
             </div>
@@ -110,27 +103,21 @@ const ListCustomers = (props) => {
         }
     };
 
-    // Manejador del evento del botón de editar
-    const handleEditCustomer = (customer) => {
-        props.setEditingCustomer(customer);
-        props.setIsDialogVisible(true);
-    };
-
-    // Abrir diálogo de confirmación para ocultar cliente
-    const handleDeleteCustomerClick = (customer) => {
+    // Abrir diálogo de confirmación para recuperar cliente
+    const handleRecoverCustomerClick = (customer) => {
         setSelectedCustomer(customer);
-        setShowDeleteDialog(true);
+        setShowRecoverDialog(true);
     };
 
-    // Confirmar ocultar cliente
-    const handleConfirmDelete = () => {
-        hideCustomer(selectedCustomer);
-        setShowDeleteDialog(false);
+    // Confirmar recuperar cliente
+    const handleConfirmRecover = () => {
+        RecoverCustomer(selectedCustomer);
+        setShowRecoverDialog(false);
         props.setReloadCustomers(prevState => !prevState);
     };
 
     // Ocultar cliente
-    const hideCustomer = async (customer) => {
+    const RecoverCustomer = async (customer) => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -144,15 +131,16 @@ const ListCustomers = (props) => {
                 }
             }
 
-            const response = await clienteAxios.put(`/cliente/hide/${customer.CodCliente}`, {}, config);
+            const response = await clienteAxios.put(`/cliente/recover/${customer.CodCliente}`, {}, config);
 
             if (!response || response.status >= 400) {
-                showFloatingAlert('danger', 'El cliente no se pudo eliminar.');
-                throw new Error('Error al eliminar el cliente.');
-            } else {
-                showFloatingAlert('success', 'Cliente eliminado correctamente.');
-            }
+                props.onShowToast('danger', 'El cliente no se pudo recuperar.');
 
+                throw new Error('Error al recuperar el cliente.');
+            } else {
+                // props.onShowToast('success', 'Cliente recuperado correctamente.');
+                showFloatingAlert('success', 'Cliente recuperado correctamente.');
+            }
 
         } catch (error) {
             console.error('Hubo un error:', error);
@@ -170,11 +158,6 @@ const ListCustomers = (props) => {
         setGlobalCustomerFilterValue(value);
     }
 
-    // Plantilla de cuerpo para la columna de verificación
-    const verifiedBodyTemplate = (rowData) => {
-        return <i className={classNames('pi', { 'text-blue-500 pi-stop': rowData.Habilitado, 'text-blue-500 pi-check-square': !rowData.Habilitado })}></i>;
-    };
-
     // Mostrar el diálogo de detalle de cliente
     const viewCustomerDetail = (rowData) => {
         setCustomerRecord(rowData);
@@ -185,18 +168,16 @@ const ListCustomers = (props) => {
     const renderFooter = () => {
         return (
             <div className="text-center">
-                <Button label="No" icon="pi pi-times" onClick={() => setShowDeleteDialog(false)} className="p-button-danger p-button-text" />
-                <Button label="Si" icon="pi pi-check" onClick={handleConfirmDelete} autoFocus className="p-button-success" />
+                <Button label="No" icon="pi pi-times" onClick={() => setShowRecoverDialog(false)} className="p-button-danger p-button-text" />
+                <Button label="Si" icon="pi pi-check" onClick={handleConfirmRecover} autoFocus className="p-button-success" />
             </div>
         );
     }
 
-    /**
-     * !IMPORTANTE: Esta función aun no funciona correctamente
-     */
-    // Actualizar tabla de clientes
-    const updateTableCustomer = () => {
+    // Cerrar diálogo de recuperación de cliente
+    const closeRecoverDialog = () => {
         props.onCustomerSaved();
+        props.setIsInactiveDialogVisible(false);
     };
 
     return (
@@ -207,7 +188,7 @@ const ListCustomers = (props) => {
                     Filtrar clientes
                 </label>
             </div>
-            <div className="flex justify-between items-center mt-1">
+            <div className="flex justify-between items-center mt-2">
                 <InputText
                     keyfilter=""
                     placeholder="Buscar cliente por dpi, nombre..."
@@ -215,31 +196,6 @@ const ListCustomers = (props) => {
                     onChange={onGlobalCustomerFilterChange}
                     className="w-full md:w-25rem"
                     style={{ height: '35px' }}
-                />
-                <div className="ml-auto flex">
-                    <Button
-                        label="Clientes Inactivos"
-                        // icon="pi pi-plus"
-                        size='small'
-                        className="p-button-secondary mr-2 text-xs"
-                        onClick={props.openInactiveDialog}
-                    />
-                    <Button
-                        label="Agregar Cliente"
-                        icon="pi pi-plus"
-                        size='small'
-                        className="p-button-success text-xs" // reduce font size
-                        onClick={props.openDialog}
-                    />
-                </div>
-            </div>
-            <div className="ml-auto flex mt-4">
-                <Button
-                    label="Actualizar Tabla"
-                    // icon="pi pi-plus"
-                    size='small'
-                    className="p-button-info mr-2 text-xs"
-                    onClick={updateTableCustomer}
                 />
             </div>
             <div className="card mt-3">
@@ -257,7 +213,7 @@ const ListCustomers = (props) => {
                     filters={customerFilters}
                     onSelectionChange={(e) => setSelectedCustomer(e.value)}
                     scrollable
-                    scrollHeight="400px"
+                    scrollHeight="350px"
                     globalFilter={globalCustomerFilterValue}
                     removableSort
                     className='p-datatable-gridlines text-xs' // text-sm reduce el tamaño de la fuente, py-1 reduce la altura de las filas
@@ -268,26 +224,35 @@ const ListCustomers = (props) => {
                     <Column field="Celular" header="Celular" style={{ width: '10%' }}></Column>
                     <Column field="Direccion" header="Direccion" ></Column>
                     <Column field="Email" header="Correo"></Column>
-                    {/* <Column body={verifiedBodyTemplate} field="Inhabilitado" header="Activo"></Column> */}
                 </DataTable>
+                <div className="card flex flex-col justify-center items-center gap-3 w-full md:w-3/4 mt-4">
+                    <div className="flex-shrink-0">
+                        <Button
+                            className='text-white text-sm bg-red-600 p-3 rounded-md font-bold md:mt-0 ml-2'
+                            label="Cerrar"
+                            onClick={closeRecoverDialog}
+                            style={{ maxWidth: '10rem' }}
+                        />
+                    </div>
+                </div>
+                {customerDialog &&
+                    <CustomerDetail
+                        customerDialog={customerDialog}
+                        setCustomerDialog={setCustomerDialog}
+                        customerRecord={customerRecord}
+                    />
+                }
+                <Dialog
+                    header="Confirmación"
+                    visible={showRecoverDialog}
+                    footer={renderFooter('displayBasic')}
+                    onHide={() => setShowRecoverDialog(false)}
+                >
+                    ¿Estás seguro de que quieres activar este cliente?
+                </Dialog>
             </div>
-            {customerDialog &&
-                <CustomerDetail
-                    customerDialog={customerDialog}
-                    setCustomerDialog={setCustomerDialog}
-                    customerRecord={customerRecord}
-                />
-            }
-            <Dialog
-                header="Confirmación"
-                visible={showDeleteDialog}
-                footer={renderFooter('displayBasic')}
-                onHide={() => setShowDeleteDialog(false)}
-            >
-                ¿Estás seguro de que quieres eliminar este cliente?
-            </Dialog>
-        </div>
-    )
+        </div >
+    );
 };
 
-export default ListCustomers;
+export default InactiveCustomers;

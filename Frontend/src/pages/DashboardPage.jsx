@@ -94,18 +94,18 @@ const DashboardPage = () => {
         <Button
           icon="pi pi-eye"
           onClick={() => editProduct(rowData)}
-          style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
+          style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
         />
         <Button
           icon="pi pi-pencil"
           onClick={() => alert('Opción en desarrollo')}
-          style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
+          style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
           className='ml-1'
         />
         <Button
           icon="pi pi-trash"
           onClick={() => alert('Opción en desarrollo')}
-          style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
+          style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
           className='ml-1'
         />
       </div>
@@ -207,9 +207,9 @@ const DashboardPage = () => {
           selection={selectedProduct}
           onSelectionChange={(e) => setSelectedProduct(e.value)}
           scrollable
-          scrollHeight="500px"
+          scrollHeight="400px"
           globalFilter={globalFilterValue}
-          className='border border-black-200 divide-y divide-black-200'
+          className='p-datatable-gridlines text-xs' // text-sm reduce el tamaño de la fuente, py-1 reduce la altura de las filas
         >
           <Column body={actionBodyTemplate} header="Acciones" exportable={false} style={{ width: '4rem' }}></Column>
           {columns.map((col, i) => (

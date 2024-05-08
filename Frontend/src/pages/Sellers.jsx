@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from 'primereact/button';
-import { DataView } from 'primereact/dataview';
 import { Toast } from 'primereact/toast';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { DataTable } from 'primereact/datatable';
@@ -107,6 +106,8 @@ const Sellers = () => {
     // Limpiar los estados una vez guardado el vendedor
     const resetState = () => {
         setSeller({
+            ...seller,
+            Id: null,
             Cedula: '',
             Nombre: '',
             Telefono: '',
@@ -227,18 +228,18 @@ const Sellers = () => {
                 <Button
                     icon="pi pi-eye"
                     onClick={() => viewSellerDetail(rowData)}
-                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
+                    style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
                 />
                 <Button
                     icon="pi pi-pencil"
                     onClick={() => editSeller(rowData)}
-                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
+                    style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
                     className='ml-1'
                 />
                 <Button
                     icon="pi pi-trash"
                     onClick={() => handleDeleteSellerClick(rowData)}
-                    style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
+                    style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
                     className='ml-1'
                 />
             </div>
@@ -309,7 +310,7 @@ const Sellers = () => {
                 showFloatingAlert('danger', 'El vendedor no se pudo ocultar.');
                 throw new Error('Error al ocultar el vendedor.');
             } else {
-                showFloatingAlert('success', 'Vendedor ocultado correctamente.');
+                showFloatingAlert('success', 'Vendedor eliminado correctamente.');
             }
 
             // Actualizar Tabpanel
@@ -319,11 +320,11 @@ const Sellers = () => {
         }
     }
 
-    const renderFooter = (name) => {
+    const renderFooter = () => {
         return (
-            <div>
-                <Button label="No" icon="pi pi-times" onClick={() => setShowDeleteDialog(false)} className="p-button-text" />
-                <Button label="Si" icon="pi pi-check" onClick={handleConfirmDelete} autoFocus />
+            <div className="text-center">
+                <Button label="No" icon="pi pi-times" onClick={() => setShowDeleteDialog(false)} className="p-button-danger p-button-text" />
+                <Button label="Si" icon="pi pi-check" onClick={handleConfirmDelete} autoFocus className="p-button-success" />
             </div>
         );
     }
@@ -341,7 +342,7 @@ const Sellers = () => {
                             <div className="flex flex-wrap gap-3 mb-4 mt-4">
                                 <div className="flex-auto">
                                     <label htmlFor="Cedula" className="font-bold block mb-2">
-                                        DPI
+                                        Cédula
                                     </label>
                                     <InputText name="Cedula" value={seller.Cedula} onChange={handleSellerChange} className="w-full" keyfilter="num" placeholder="" minLength={13} maxLength={13} required />
                                 </div>
@@ -387,7 +388,7 @@ const Sellers = () => {
                                         onClick={checkSeller}
                                         style={{ maxWidth: '10rem' }}
                                     />
-                                    {seller.Id && (
+                                    {seller.Id !== 0 && (
                                         <Button
                                             className='text-white text-sm bg-red-600 p-3 rounded-md font-bold md:mt-0 ml-2'
                                             label="Cancelar"
@@ -403,7 +404,11 @@ const Sellers = () => {
                 </TabPanel>
                 <TabPanel header="Listar">
                     <div className="flex flex-col justify-content-center">
-                        <div className="mt-2">Filtrar vendedores</div>
+                        <div className="flex justify-between items-center">
+                            <label className="block text-gray-700 text-lg font-bold" htmlFor="search">
+                                Filtrar vendedores
+                            </label>
+                        </div>
                         <div className="flex gap-3 mt-2">
                             <InputText
                                 keyfilter=""
@@ -411,6 +416,7 @@ const Sellers = () => {
                                 value={globalSellerFilterValue}
                                 onChange={onGlobalSellerFilterChange}
                                 className="w-full md:w-25rem"
+                                style={{ height: '35px' }}
                             />
                         </div>
                     </div>
@@ -429,10 +435,11 @@ const Sellers = () => {
                             filters={sellerFilters}
                             onSelectionChange={(e) => setSelectedSeller(e.value)}
                             scrollable
-                            scrollHeight="500px"
+                            scrollHeight="400px"
                             globalFilter={globalSellerFilterValue}
                             removableSort
-                            className='border border-black-200 divide-y divide-black-200'
+                            className='p-datatable-gridlines text-xs' // text-sm reduce el tamaño de la fuente, py-1 reduce la altura de las filas
+
                         >
                             <Column body={actionBodyTemplate} header="Acciones" exportable={false} style={{ width: '150px' }}></Column>
                             <Column field="Cedula" header="DPI"></Column>
@@ -440,7 +447,7 @@ const Sellers = () => {
                             <Column field="Celular" header="Celular" style={{ width: '10%' }}></Column>
                             <Column field="Direccion" header="Direccion" ></Column>
                             <Column field="Correo" header="Correo"></Column>
-                            <Column body={verifiedBodyTemplate} field="Inhabilitado" header="Activo"></Column>
+                            {/* <Column body={verifiedBodyTemplate} field="Inhabilitado" header="Activo"></Column> */}
                         </DataTable>
                     </div>
                     {sellerDialog && <SellerDetail
@@ -453,13 +460,14 @@ const Sellers = () => {
             <Dialog
                 header="Confirmación"
                 visible={showDeleteDialog}
-                style={{ width: '25vw', height: '16vw' }}
+                // style={{ width: '24vw', height: '16vw' }}
                 footer={renderFooter('displayBasic')}
                 onHide={() => setShowDeleteDialog(false)}
             >
-                <div style={{ wordWrap: 'break-word' }}>
-                    ¿Estás seguro de que quieres eliminar este vendedor? Esta acción no se puede deshacer.
-                </div>
+                {/* <div style={{ wordWrap: 'break-word' }}> */}
+                ¿Estás seguro de que quieres eliminar este vendedor?
+                Esta acción no se puede deshacer.
+                {/* </div> */}
             </Dialog>
         </div>
     )

@@ -333,25 +333,25 @@ const Orders = () => {
     const actionBodyTemplate = (rowData) => {
         return (
             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-              <Button
-                icon="pi pi-eye"
-                onClick={() => viewOrderDetail(rowData)}
-                style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
-              />
-              <Button
-                icon="pi pi-pencil"
-                onClick={() => alert('Opción en desarrollo')}
-                style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
-                className='ml-1'
-              />
-              <Button
-                icon="pi pi-trash"
-                onClick={() => alert('Opción en desarrollo')}
-                style={{ padding: '0.3rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
-                className='ml-1'
-              />
+                <Button
+                    icon="pi pi-eye"
+                    onClick={() => viewOrderDetail(rowData)}
+                    style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#48BB78', color: '#FFFFFF' }}
+                />
+                <Button
+                    icon="pi pi-pencil"
+                    onClick={() => alert('Opción en desarrollo')}
+                    style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#4299E1', color: '#FFFFFF' }}
+                    className='ml-1'
+                />
+                <Button
+                    icon="pi pi-trash"
+                    onClick={() => alert('Opción en desarrollo')}
+                    style={{ padding: '0.0rem', fontSize: '0.75rem', backgroundColor: '#F56565', color: '#FFFFFF' }}
+                    className='ml-1'
+                />
             </div>
-          );
+        );
     };
 
     // Verificar búsqueda de pedidos
@@ -573,7 +573,9 @@ const Orders = () => {
                 <TabPanel header="Listar">
                     <Toast ref={toast} />
                     <div className="flex flex-col justify-content-center">
-                        <div className="mt-2">Filtrar pedidos por vendedor</div>
+                        <label className="block text-gray-700 text-lg font-bold" htmlFor="search">
+                            Filtrar pedidos por vendedor
+                        </label>
                         <div className="flex gap-3 mt-2">
                             <Dropdown
                                 value={selectedSeller}
@@ -584,14 +586,18 @@ const Orders = () => {
                                 filter
                                 filterBy="nombre"
                                 onFilter={(e) => filterSellers(e)}
-                                className="md:w-25rem gap-3"
+                                className="md:w-25rem mt-2 h-10 text-xs gap-3"
+                                // className="w-full md:w-14rem ml-3 mt-2 h-10 text-xs"
+
                             />
                             <Button
                                 label="Buscar"
                                 severity="secondary"
                                 raised
                                 onClick={verificarBusqueda}
-                                className='text-white text-sm bg-sky-600 p-3 rounded-md font-bold md:mt-0'
+                                className='text-white text-xs bg-sky-600 p-3 rounded-md font-bold md:mt-0'
+                                // className="p-button-success text-xs" // reduce font size
+
                             />
                         </div>
                     </div>
@@ -609,9 +615,9 @@ const Orders = () => {
                             selectionMode="single"
                             filters={filteredOrder}
                             scrollable
-                            scrollHeight="500px"
+                            scrollHeight="400px"
                             removableSort
-                            className='border border-black-200 divide-y divide-black-200'
+                            className='p-datatable-gridlines text-xs' // text-sm reduce el tamaño de la fuente, py-1 reduce la altura de las filas
                         >
                             <Column body={actionBodyTemplate} header="Acciones" exportable={false}></Column>
                             <Column field="Id_pedido" header="Código"></Column>
